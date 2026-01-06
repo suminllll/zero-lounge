@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
-import { Noto_Sans_KR } from 'next/font/google'
+import { Nanum_Gothic} from 'next/font/google'
 import "./globals.css";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import 'antd/dist/antd.css'
 
-
-const notoSans = Noto_Sans_KR({
-  variable: '--font-noto-sans',
+const nanumGothic = Nanum_Gothic({
   subsets: ['latin'],
-  weight: ['100', '300', '400', '500', '700', '900'],
+  weight: ['400', '700'],
+  display: "swap",
 })
 
 export const metadata: Metadata = {
@@ -22,10 +24,15 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-      className={`${notoSans.variable} font-sans antialiased m-0 p-0`}
+      className={`${nanumGothic.className} font-sans antialiased m-0 p-0`}
         suppressHydrationWarning={true}
       >
+      <Header />
+<main className="flex-1">
         {children}
+        </main>
+      <Footer />
+
       </body>
     </html>
   );

@@ -1,16 +1,11 @@
-import HeroSection from "./components/HeroSection";
-import SecondSection from "./components/secondSection";
-
-
+import AboutSection from './components/main/AboutSection'
+import HeroSection from './components/main/HeroSection'
 
 export default function Home() {
- 
-
-
   return (
-    <div className="bg-primary">
-   <HeroSection/>
-   <SecondSection/>
+    <div>
+      <HeroSection />
+      <AboutSection />
     </div>
-  );
+  )
 }

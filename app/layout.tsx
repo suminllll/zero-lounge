@@ -1,14 +1,13 @@
 import type { Metadata } from 'next'
-import { Nanum_Gothic } from 'next/font/google'
+import localFont from 'next/font/local'
 import './globals.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
-// import 'antd/dist/antd.css'
 
-const nanumGothic = Nanum_Gothic({
-  subsets: ['latin'],
-  weight: ['400', '700'],
+const suit = localFont({
+  src: '../public/fonts/SUIT-Variable.ttf',
   display: 'swap',
+  variable: '--font-suit',
 })
 
 export const metadata: Metadata = {
@@ -24,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-        className={`${nanumGothic.className} font-sans antialiased m-0 p-0 min-h-screen`}
+        className={`${suit.className} antialiased m-0 p-0 min-h-screen relative`}
         suppressHydrationWarning={true}
       >
         <Header />

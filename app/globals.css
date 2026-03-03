@@ -113,6 +113,18 @@ body {
   );
 }
 
+/* Step 애니메이션 */
+@keyframes stepForward {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes stepBackward {
+  from { transform: translateX(-40px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+.step-forward  { animation: stepForward  0.4s ease-out both; }
+.step-backward { animation: stepBackward 0.4s ease-out both; }
+
 .glass-card-v2::after {
   content: '';
   position: absolute;

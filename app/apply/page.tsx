@@ -23,6 +23,7 @@ const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
 export default function ApplyPage() {
   const [step, setStep] = useState(1)
+  const [direction, setDirection] = useState<'forward' | 'backward'>('forward')
   const [isLoading, setIsLoading] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
   const [formData, setFormData] = useState<FormData>({
@@ -39,6 +40,13 @@ export default function ApplyPage() {
   })
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [copied, setCopied] = useState(false)
+
+  const handleCopyAccount = async () => {
+    await navigator.clipboard.writeText('1002-164-275949')
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   // Supabase에서 이벤트 불러오기
   const [events, setEvents] = useState<Event[]>([])
@@ -60,8 +68,8 @@ export default function ApplyPage() {
   const selectedEvent = formData.date ? eventsMap[formData.date] : null
   const displaySeats = selectedEvent ? getDisplaySeats(selectedEvent) : null
 
-  const next = () => setStep(s => s + 1)
-  const back = () => setStep(s => Math.max(1, s - 1))
+  const next = () => { setDirection('forward'); setStep(s => s + 1) }
+  const back = () => { setDirection('backward'); setStep(s => Math.max(1, s - 1)) }
 
   const handleSubmit = async () => {
     setIsLoading(true)
@@ -205,7 +213,7 @@ export default function ApplyPage() {
         </div>
       </div>
 
-      <div className="px-5 py-8">
+      <div key={step} className={`px-5 py-8 ${direction === 'forward' ? 'step-forward' : 'step-backward'}`}>
         {/* Step 1: 달력 */}
         {step === 1 && (
           <div>
@@ -564,7 +572,16 @@ export default function ApplyPage() {
               <div className="border-t border-primary/20 pt-5">
                 <p className="text-[#8F8781] text-xs mb-1">입금 계좌</p>
                 <p className="text-[#f5e2d4] font-semibold text-base">우리은행</p>
-                <p className="text-[#f5e2d4] font-semibold text-base">1002-164-275949</p>
+                <div className="flex items-center justify-between gap-2 mt-0.5">
+                  <p className="text-[#f5e2d4] font-semibold text-base">1002-164-275949</p>
+                  <button
+                    onClick={handleCopyAccount}
+                    className="shrink-0 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors"
+                    style={{ backgroundColor: copied ? '#4ade80' : '#c6beb8', color: '#1a1210' }}
+                  >
+                    {copied ? '복사됨' : '복사'}
+                  </button>
+                </div>
               </div>
               <div className="border-t border-primary/20 mt-5 pt-4 text-xs leading-6">
                 <p>입금 완료 시 신청이 확정됩니다.</p>

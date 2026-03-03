@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/Users/sumin/.nvm/versions/node/v22.19.0/bin/node /Users/sumin/.nvm/versions/node/v22.19.0/bin/npm install yet-another-react-lightbox --prefix /Users/sumin/Dev_Workspace/zero-lounge)",
+      "Bash(/usr/local/bin/node /Users/sumin/Dev_Workspace/zero-lounge/node_modules/.bin/tsc --noEmit)",
+      "Bash(npm install @supabase/supabase-js)"
+    ]
+  }
+}

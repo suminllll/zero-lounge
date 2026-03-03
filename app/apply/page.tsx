@@ -9,16 +9,13 @@ type FormData = {
   date: string
   gender: string
   name: string
-  nickname: string
   birthYear: string
-  job: string
-  mbti: string
   photo: File | null
   contact: string
   referral: string
 }
 
-const TOTAL_STEPS = 13
+const TOTAL_STEPS = 10
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
 export default function ApplyPage() {
@@ -30,10 +27,7 @@ export default function ApplyPage() {
     date: '',
     gender: '',
     name: '',
-    nickname: '',
     birthYear: '',
-    job: '',
-    mbti: '',
     photo: null,
     contact: '',
     referral: '',
@@ -68,8 +62,14 @@ export default function ApplyPage() {
   const selectedEvent = formData.date ? eventsMap[formData.date] : null
   const displaySeats = selectedEvent ? getDisplaySeats(selectedEvent) : null
 
-  const next = () => { setDirection('forward'); setStep(s => s + 1) }
-  const back = () => { setDirection('backward'); setStep(s => Math.max(1, s - 1)) }
+  const next = () => {
+    setDirection('forward')
+    setStep(s => s + 1)
+  }
+  const back = () => {
+    setDirection('backward')
+    setStep(s => Math.max(1, s - 1))
+  }
 
   const handleSubmit = async () => {
     setIsLoading(true)
@@ -95,10 +95,7 @@ export default function ApplyPage() {
         date: formData.date,
         gender: formData.gender,
         name: formData.name,
-        nickname: formData.nickname,
         birth_year: formData.birthYear,
-        job: formData.job,
-        mbti: formData.mbti,
         photo_url: photoUrl,
         contact: formData.contact,
         referral: formData.referral,
@@ -123,11 +120,27 @@ export default function ApplyPage() {
 
   // 캘린더 계산
   const now = new Date()
-  const year = now.getFullYear()
-  const month = now.getMonth()
+  const [calYear, setCalYear] = useState(now.getFullYear())
+  const [calMonth, setCalMonth] = useState(now.getMonth())
+  const year = calYear
+  const month = calMonth
   const daysInMonth = new Date(year, month + 1, 0).getDate()
   const firstDay = new Date(year, month, 1).getDay()
   const monthLabel = `${year}년 ${month + 1}월`
+
+  const goPrevMonth = () => {
+    if (calMonth === 0) {
+      setCalYear(y => y - 1)
+      setCalMonth(11)
+    } else setCalMonth(m => m - 1)
+  }
+  const goNextMonth = () => {
+    if (calMonth === 11) {
+      setCalYear(y => y + 1)
+      setCalMonth(0)
+    } else setCalMonth(m => m + 1)
+  }
+  const isPrevDisabled = calYear === now.getFullYear() && calMonth === now.getMonth()
 
   const formatDate = (day: number) =>
     `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
@@ -141,14 +154,10 @@ export default function ApplyPage() {
     return display.female > 0 || display.male > 0
   }
 
-  const isAdult =
-    formData.birthYear.length === 4 &&
-    new Date().getFullYear() - parseInt(formData.birthYear) >= 19
-
   // 로딩 화면
   if (isLoading) {
     return (
-      <main className="bg-secondary min-h-screen flex flex-col items-center justify-center gap-6">
+      <main className="bg-secondary h-dvh flex flex-col items-center justify-center gap-6">
         <div className="flex flex-col items-center gap-5">
           <div className="w-10 h-10 border-2 border-primary/20 border-t-[#c6beb8] rounded-full animate-spin" />
           <p className="text-[#c6beb8] text-sm">제출 중...</p>
@@ -157,40 +166,41 @@ export default function ApplyPage() {
     )
   }
 
-  // 완료 화면
   if (isComplete) {
     return (
-      <main className="bg-secondary min-h-screen flex flex-col items-center justify-center px-6 text-center gap-8">
-        <div className="text-5xl">☺️</div>
-        <div>
-          <p className="text-[#f5e2d4] text-2xl font-bold mb-8">제로라운지 신청 완료</p>
-          <p className="text-[#c6beb8] text-[15px] leading-8 font-light">
-            장소는 공덕역에서 도보 10분 이내 거리예요!
-            <br />
-            <br />
-            안전을 위해 상세 위치는
-            <br />
-            DM 보내주시는 분께 안내해 드릴 예정입니다 :)
-            <br />
-            <br />
-            그럼, 우리 곧 봐요 ☺️
-          </p>
-        </div>
-        <Link
-          href="/"
-          className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px]"
+      <div className="bg-secondary h-dvh flex flex-col items-center justify-center gap-6 px-8 text-center">
+        <h2 className="text-[#f5e2d4] text-xl font-bold">제로라운지 신청 완료</h2>
+
+        <p className="text-[#8F8781] text-sm leading-6">
+          인스타그램 <span className="text-[#c6beb8] font-semibold">@zero__lounge</span>를<br />
+          팔로우 후 DM으로 입금자명과 참여 날짜를
+          <br />
+          보내주시면 최종 확정됩니다.
+        </p>
+        <p className="text-xs text-[#8F8781] leading-5">
+          * 팔로우를 하지 않고 DM을 보낼경우 스팸처리함으로 들어가니 <br />꼭 팔로우 후에 DM을
+          보내주세요. <br />* DM이 확인되지 않을 경우, 모임 입장이 제한될 수 있습니다.
+        </p>
+        <a
+          href="https://www.instagram.com/zero__lounge/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 w-full py-3 rounded-full font-bold text-secondary text-[17px]"
           style={{ backgroundColor: '#c6beb8' }}
         >
-          홈으로
+          인스타그램으로 이동
+        </a>
+        <Link href="/" className="text-[#8F8781] text-sm underline mt-2">
+          홈으로 돌아가기
         </Link>
-      </main>
+      </div>
     )
   }
 
   return (
-    <main className="bg-secondary min-h-screen text-primary">
+    <div className="bg-secondary h-dvh  flex flex-col text-primary">
       {/* 상단 진행바 */}
-      <div className="sticky top-0 z-10 bg-secondary pt-4 pb-3 px-5">
+      <div className="bg-secondary pt-16 pb-3 px-5 shrink-0">
         <div className="flex items-center gap-3">
           {step > 1 ? (
             <button onClick={back} className="text-[#c6beb8] shrink-0">
@@ -213,7 +223,10 @@ export default function ApplyPage() {
         </div>
       </div>
 
-      <div key={step} className={`px-5 py-8 ${direction === 'forward' ? 'step-forward' : 'step-backward'}`}>
+      <div
+        key={step}
+        className={`flex-1 overflow-y-auto px-5 py-6 ${direction === 'forward' ? 'step-forward' : 'step-backward'}`}
+      >
         {/* Step 1: 달력 */}
         {step === 1 && (
           <div>
@@ -224,82 +237,89 @@ export default function ApplyPage() {
               </div>
             ) : (
               <>
-                <p className="text-[#c6beb8] text-center text-sm font-bold mb-4">{monthLabel}</p>
+                <div className="flex items-center justify-between mb-4">
+                  <button
+                    onClick={goPrevMonth}
+                    disabled={isPrevDisabled}
+                    className="text-[#c6beb8] px-2 disabled:opacity-25"
+                  >
+                    ‹
+                  </button>
+                  <p className="text-[#c6beb8] text-sm font-bold">{monthLabel}</p>
+                  <button onClick={goNextMonth} className="text-[#c6beb8] px-2">
+                    ›
+                  </button>
+                </div>
                 <div className="grid grid-cols-7 mb-2">
                   {DAY_LABELS.map(d => (
-                    <div key={d} className="text-center text-[#8F8781] text-xs py-1">{d}</div>
+                    <div key={d} className="text-center text-[#8F8781] text-xs py-1">
+                      {d}
+                    </div>
                   ))}
                 </div>
                 <div className="grid grid-cols-7 gap-y-2">
-                  {Array(firstDay).fill(null).map((_, i) => <div key={`e-${i}`} />)}
-                  {Array(daysInMonth).fill(null).map((_, i) => {
-                    const day = i + 1
-                    const dateStr = formatDate(day)
-                    const selectable = isDateSelectable(dateStr)
-                    const isSelected = formData.date === dateStr
-                    return (
-                      <button
-                        key={day}
-                        onClick={() => selectable && setFormData(f => ({ ...f, date: dateStr }))}
-                        disabled={!selectable}
-                        className={`aspect-square rounded-full text-sm flex items-center justify-center mx-auto w-9
+                  {Array(firstDay)
+                    .fill(null)
+                    .map((_, i) => (
+                      <div key={`e-${i}`} />
+                    ))}
+                  {Array(daysInMonth)
+                    .fill(null)
+                    .map((_, i) => {
+                      const day = i + 1
+                      const dateStr = formatDate(day)
+                      const selectable = isDateSelectable(dateStr)
+                      const isSelected = formData.date === dateStr
+                      return (
+                        <button
+                          key={day}
+                          onClick={() => selectable && setFormData(f => ({ ...f, date: dateStr }))}
+                          disabled={!selectable}
+                          className={`aspect-square rounded-full text-sm flex items-center justify-center mx-auto w-9
                           ${isSelected ? 'text-secondary font-bold' : ''}
                           ${selectable && !isSelected ? 'text-[#f5e2d4] font-medium' : ''}
                           ${!selectable ? 'text-primary/25' : ''}
                         `}
-                        style={isSelected ? { backgroundColor: '#c6beb8' } : {}}
-                      >
-                        {day}
-                      </button>
-                    )
-                  })}
+                          style={isSelected ? { backgroundColor: '#c6beb8' } : {}}
+                        >
+                          {day}
+                        </button>
+                      )
+                    })}
                 </div>
               </>
+            )}
+            {selectedEvent && displaySeats && (
+              <div className="mt-6">
+                <div className="flex gap-4 mb-4">
+                  <div className="flex flex-col gap-2 items-center justify-center w-full bg-primary/10 rounded-full py-1.5 px-4 text-center">
+                    <div className="flex gap-2 items-center">
+                      <p className="text-[#8F8781] text-xs">시작 시간</p>
+                      <p className="text-[#f5e2d4] text-l font-bold">{selectedEvent.time}</p>
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <p className="text-[#8F8781] text-xs">여성 잔여</p>
+                      <p className="text-[#f5e2d4] text-l font-bold">{displaySeats.female} 자리</p>
+                      <p className="text-[#8F8781] text-xs">/ 남성 잔여</p>
+                      <p className="text-[#f5e2d4] text-l font-bold">{displaySeats.male} 자리</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
             <button
               onClick={next}
               disabled={!formData.date}
-              className="mt-10 block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] disabled:opacity-40 transition-opacity"
+              className="mt-6 block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] disabled:opacity-40 transition-opacity"
               style={{ backgroundColor: '#c6beb8' }}
             >
-              다음
+              {selectedEvent ? '신청하기' : '다음'}
             </button>
           </div>
         )}
 
-        {/* Step 2: 잔여 자리 + 시작 시간 */}
-        {step === 2 && selectedEvent && displaySeats && (
-          <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-1">선택한 날짜</h2>
-            <p className="text-[#8F8781] text-sm mb-8">{formData.date.replace(/-/g, '.')}</p>
-            <div className="flex gap-4 mb-4">
-              <div className="flex-1 bg-primary/10 rounded-2xl p-5 text-center">
-                <p className="text-[#8F8781] text-xs mb-2">여성 잔여</p>
-                <p className="text-[#f5e2d4] text-4xl font-bold">{displaySeats.female}</p>
-                <p className="text-[#8F8781] text-xs mt-1">자리</p>
-              </div>
-              <div className="flex-1 bg-primary/10 rounded-2xl p-5 text-center">
-                <p className="text-[#8F8781] text-xs mb-2">남성 잔여</p>
-                <p className="text-[#f5e2d4] text-4xl font-bold">{displaySeats.male}</p>
-                <p className="text-[#8F8781] text-xs mt-1">자리</p>
-              </div>
-            </div>
-            <div className="bg-primary/10 rounded-2xl p-5 text-center mb-10">
-              <p className="text-[#8F8781] text-xs mb-1">시작 시간</p>
-              <p className="text-[#f5e2d4] text-3xl font-bold">{selectedEvent.time}</p>
-            </div>
-            <button
-              onClick={next}
-              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px]"
-              style={{ backgroundColor: '#c6beb8' }}
-            >
-              신청하기
-            </button>
-          </div>
-        )}
-
-        {/* Step 3: 성별 */}
-        {step === 3 && (
+        {/* Step 2: 성별 */}
+        {step === 2 && (
           <div>
             <h2 className="text-[#f5e2d4] text-xl font-bold mb-10">성별을 선택해주세요</h2>
             <div className="flex gap-4 mb-10">
@@ -326,21 +346,26 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 4: 실명 */}
-        {step === 4 && (
+        {/* Step 3: 실명 */}
+        {step === 3 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-2">실명을 알려주세요</h2>
-            <p className="text-[#8F8781] text-sm mb-8">본인 확인에 사용됩니다.</p>
+            <h2 className="text-[#f5e2d4] text-xl font-bold mb-2">
+              실명과 모임에서 사용할 닉네임을
+              <br />
+              알려주세요
+            </h2>
+            <p className="text-[#8F8781] text-sm mb-8">ex)홍길동/동이</p>
+
             <input
               type="text"
               value={formData.name}
               onChange={e => setFormData(f => ({ ...f, name: e.target.value }))}
-              placeholder="홍길동"
+              placeholder="홍길동/동이"
               className="w-full bg-primary/10 rounded-2xl px-5 py-4 text-[#f5e2d4] text-base placeholder:text-primary/30 outline-none mb-10"
             />
             <button
               onClick={next}
-              disabled={!formData.name.trim()}
+              disabled={formData.name.trim().length < 4}
               className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] disabled:opacity-40"
               style={{ backgroundColor: '#c6beb8' }}
             >
@@ -349,52 +374,22 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 5: 닉네임 */}
-        {step === 5 && (
+        {/* Step 4: 출생년도 */}
+        {step === 4 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-2">모임에서 사용할 닉네임을<br />알려주세요</h2>
-            <p className="text-[#8F8781] text-sm mb-8">이름 대신 불릴 닉네임이에요.</p>
-            <input
-              type="text"
-              value={formData.nickname}
-              onChange={e => setFormData(f => ({ ...f, nickname: e.target.value }))}
-              placeholder="닉네임"
-              className="w-full bg-primary/10 rounded-2xl px-5 py-4 text-[#f5e2d4] text-base placeholder:text-primary/30 outline-none mb-10"
-            />
-            <button
-              onClick={next}
-              disabled={!formData.nickname.trim()}
-              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] disabled:opacity-40"
-              style={{ backgroundColor: '#c6beb8' }}
-            >
-              다음
-            </button>
-          </div>
-        )}
-
-        {/* Step 6: 출생년도 */}
-        {step === 6 && (
-          <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-2">출생년도 4자리를<br />기입해주세요</h2>
-            <p className="text-[#8F8781] text-sm mb-1">ex. 1997</p>
+            <h2 className="text-[#f5e2d4] text-xl font-bold mb-2">출생년도와 MBTI를 알려주세요</h2>
+            <p className="text-[#8F8781] text-sm mb-1">ex. 1997, 마케터</p>
             <p className="text-[#8F8781] text-xs mb-8">* 미성년자는 참가할 수 없습니다.</p>
             <input
-              type="number"
+              type="text"
               value={formData.birthYear}
-              onChange={e => {
-                const val = e.target.value.slice(0, 4)
-                setFormData(f => ({ ...f, birthYear: val }))
-              }}
-              placeholder="1997"
-              className="w-full bg-primary/10 rounded-2xl px-5 py-4 text-[#f5e2d4] text-base placeholder:text-primary/30 outline-none mb-2"
+              onChange={e => setFormData(f => ({ ...f, birthYear: e.target.value }))}
+              placeholder="1997, 마케터"
+              className="w-full bg-primary/10 rounded-2xl px-5 py-4 text-[#f5e2d4] text-base placeholder:text-primary/30 outline-none mb-10"
             />
-            {formData.birthYear.length === 4 && !isAdult && (
-              <p className="text-red-400 text-sm mb-4">미성년자는 참가할 수 없습니다.</p>
-            )}
-            <div className="mb-8" />
             <button
               onClick={next}
-              disabled={!isAdult}
+              disabled={!formData.birthYear.trim()}
               className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] disabled:opacity-40"
               style={{ backgroundColor: '#c6beb8' }}
             >
@@ -403,41 +398,14 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 7: 직업 + MBTI */}
-        {step === 7 && (
+        {/* Step 5: 사진 */}
+        {step === 5 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-8">직업과 MBTI를<br />알려주세요</h2>
-            <div className="flex flex-col gap-4 mb-10">
-              <input
-                type="text"
-                value={formData.job}
-                onChange={e => setFormData(f => ({ ...f, job: e.target.value }))}
-                placeholder="직업 (ex. 개발자, 디자이너)"
-                className="w-full bg-primary/10 rounded-2xl px-5 py-4 text-[#f5e2d4] text-base placeholder:text-primary/30 outline-none"
-              />
-              <input
-                type="text"
-                value={formData.mbti}
-                onChange={e => setFormData(f => ({ ...f, mbti: e.target.value.toUpperCase().slice(0, 4) }))}
-                placeholder="MBTI (ex. INFJ)"
-                className="w-full bg-primary/10 rounded-2xl px-5 py-4 text-[#f5e2d4] text-base placeholder:text-primary/30 outline-none"
-              />
-            </div>
-            <button
-              onClick={next}
-              disabled={!formData.job.trim() || formData.mbti.length !== 4}
-              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] disabled:opacity-40"
-              style={{ backgroundColor: '#c6beb8' }}
-            >
-              다음
-            </button>
-          </div>
-        )}
-
-        {/* Step 8: 사진 */}
-        {step === 8 && (
-          <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-2">본인 확인을 위해<br />최근 사진 한 장을 첨부해주세요</h2>
+            <h2 className="text-[#f5e2d4] text-xl font-bold mb-2">
+              본인 확인을 위해
+              <br />
+              최근 사진 한 장을 첨부해주세요
+            </h2>
             <p className="text-[#8F8781] text-xs mb-8">* 앞/옆모습 가능, 뒷모습은 불가능합니다.</p>
             <div
               onClick={() => fileInputRef.current?.click()}
@@ -476,10 +444,14 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 9: 연락처 */}
-        {step === 9 && (
+        {/* Step 6: 연락처 */}
+        {step === 6 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-2">모임 참여에 대한 안내를 받아보실<br />연락처를 알려주세요</h2>
+            <h2 className="text-[#f5e2d4] text-xl font-bold mb-2">
+              모임 참여에 대한 안내를 받아보실
+              <br />
+              연락처를 알려주세요
+            </h2>
             <p className="text-[#8F8781] text-sm mb-8">카카오톡 또는 문자로 안내드려요.</p>
             <input
               type="tel"
@@ -499,10 +471,14 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 10: 유입 경로 */}
-        {step === 10 && (
+        {/* Step 7: 유입 경로 */}
+        {step === 7 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-8">제로라운지를<br />어디서 보고 오셨나요?</h2>
+            <h2 className="text-[#f5e2d4] text-xl font-bold mb-8">
+              제로라운지를
+              <br />
+              어디서 보고 오셨나요?
+            </h2>
             <div className="flex flex-col gap-3 mb-10">
               {['인스타그램 릴스', '인스타그램 광고', '스레드', '기타'].map(option => (
                 <button
@@ -527,20 +503,24 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 11: 환불 안내 */}
-        {step === 11 && (
+        {/* Step 8: 환불 안내 */}
+        {step === 8 && (
           <div>
             <h2 className="text-[#f5e2d4] text-xl font-bold mb-6">환불 안내</h2>
             <div className="bg-primary/10 rounded-2xl p-6 text-[#c6beb8] text-[14px] leading-7 mb-8">
               <p className="font-bold text-[#f5e2d4] mb-3">제로라운지에서는</p>
               <p className="mb-4">
-                신청서를 신중히 검토한 후,<br />
+                신청서를 신중히 검토한 후,
+                <br />
                 모임에 어울리는 분들만 초대합니다.
               </p>
               <p className="mb-6">
-                신청 조건에 부합하지 않거나,<br />
-                신청 인원이 초과될 경우<br />
-                선정에서 제외될 수 있습니다.<br />
+                신청 조건에 부합하지 않거나,
+                <br />
+                신청 인원이 초과될 경우
+                <br />
+                선정에서 제외될 수 있습니다.
+                <br />
                 <span className="text-xs text-[#8F8781]">(해당 경우에는 전액 환불 됩니다.)</span>
               </p>
               <div className="border-t border-primary/20 pt-4 flex flex-col gap-1">
@@ -560,8 +540,8 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 12: 참가비 */}
-        {step === 12 && (
+        {/* Step 9: 참가비 */}
+        {step === 9 && (
           <div>
             <h2 className="text-[#f5e2d4] text-xl font-bold mb-6">참가비 안내</h2>
             <div className="bg-primary/10 rounded-2xl p-6 text-[#c6beb8] text-[14px] leading-7 mb-8">
@@ -585,9 +565,18 @@ export default function ApplyPage() {
               </div>
               <div className="border-t border-primary/20 mt-5 pt-4 text-xs leading-6">
                 <p>입금 완료 시 신청이 확정됩니다.</p>
-                <p className="text-[#8F8781]">* 입금이 지연될 경우, 신청서를 다시 작성하셔야 합니다.</p>
+                <p className="text-[#8F8781]">
+                  * 입금이 지연될 경우, 신청서를 다시 작성하셔야 합니다.
+                </p>
               </div>
             </div>
+            <button
+              onClick={() => window.open('https://qr.kakaopay.com/Ej9ND22l6', '_blank')}
+              className="block w-full py-4 mb-3 rounded-2xl text-center font-bold text-secondary text-[17px]"
+              style={{ backgroundColor: '#c6beb8' }}
+            >
+              카카오페이로 송금하고 오기
+            </button>
             <button
               onClick={next}
               className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px]"
@@ -598,25 +587,27 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 13: 필독 + 제출 */}
-        {step === 13 && (
+        {/* Step 10: 필독 + 제출 */}
+        {step === 10 && (
           <div>
             <h2 className="text-[#f5e2d4] text-xl font-bold mb-6">▪️ 필독사항 ▪️</h2>
             <div className="bg-primary/10 rounded-2xl p-6 text-[#c6beb8] text-[14px] leading-7 mb-8">
               <p className="mb-4">
-                인스타 계정(<span className="text-[#f5e2d4] font-semibold">@zero__lounge</span>)를<br />
-                팔로우한 뒤,<br />
-                아래 내용을 DM으로 보내주셔야<br />
+                인스타 계정(<span className="text-[#f5e2d4] font-semibold">@zero__lounge</span>)를
+                <br />
+                팔로우한 뒤,
+                <br />
+                아래 내용을 DM으로 보내주셔야
+                <br />
                 신청이 완료됩니다.
               </p>
               <div className="bg-secondary/60 rounded-xl p-4 mb-4">
-                <p className="text-[#f5e2d4] font-semibold">입금자명,</p>
-                <p className="text-[#f5e2d4] font-semibold">참여 날짜</p>
+                <p className="text-[#f5e2d4] font-semibold">입금자명, 참여 날짜</p>
                 <p className="text-[#8F8781] text-xs mt-1">(ex. 홍길동 10/3 금요일)</p>
               </div>
               <p className="text-xs text-[#8F8781] leading-5">
-                * DM이 확인되지 않을 경우,<br />
-                모임 입장이 제한될 수 있습니다.
+                * 팔로우를 하지 않고 DM을 보낼경우 스팸처리함으로 들어가니 꼭 팔로우 후에 DM을
+                보내주세요. <br />* DM이 확인되지 않을 경우, 모임 입장이 제한될 수 있습니다.
               </p>
             </div>
             <button
@@ -624,11 +615,11 @@ export default function ApplyPage() {
               className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px]"
               style={{ backgroundColor: '#c6beb8' }}
             >
-              신청서 작성, 입금 후 인스타 DM
+              신청서 작성 완료
             </button>
           </div>
         )}
       </div>
-    </main>
+    </div>
   )
 }

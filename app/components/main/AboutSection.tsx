@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import GallerySlider from './GallerySlider'
+import GallerySliderWrapper from './GallerySliderWrapper'
 import SocialButtons from './SocialButtons'
 import PartyCards from './PartyCards'
 
@@ -116,23 +116,24 @@ const AboutSection = () => {
               </p>
             </div>
             <div>
+              <p className="font-bold text-base">제공 메뉴</p>
+              <p className="text-sm mt-1 font-light leading-6">
+                오리고기 / 볶음밥 / 떡볶이 / 샐러드
+              </p>
+            </div>
+            <div>
+              <p className="font-bold text-base">제공 주류</p>
+              <p className="text-sm mt-1 font-light leading-6">
+                말차 하이볼 / 얼그레이 하이볼 /<br /> 소주 / 맥주 무제한
+              </p>
+            </div>
+            <div>
               <p className="font-bold text-base">일정</p>
               <p className="text-sm mt-1 font-light leading-6">
                 금요일 8시 <br /> 토.일요일 6시 30분
               </p>
             </div>
-            {/* <div>
-              <p className="font-bold text-base">제공 메뉴</p>
-              <p className="text-sm mt-1 font-light leading-6">
-                오리고기 / 떡볶이 <br />/ 소불고기 볶음밥 / 유자샐러드
-              </p>
-            </div>
-             <div>
-              <p className="font-bold text-base">제공 주류</p>
-              <p className="text-sm mt-1 font-light leading-6">
-                오리고기 / 떡볶이 <br />/ 소불고기 볶음밥 / 유자샐러드
-              </p>
-            </div> */}
+
             <div>
               <p className="font-bold text-base">러닝타임</p>
               <p className="text-sm mt-1 font-light">150분 / 2부(선택)</p>
@@ -193,7 +194,7 @@ const AboutSection = () => {
           </p>
         </div>
 
-        <GallerySlider />
+        <GallerySliderWrapper />
 
         <div className="my-30 px-5">
           <p className=" text-[#f5e2d4] text-[30px] font-bold leading-snug mb-2">QnA</p>

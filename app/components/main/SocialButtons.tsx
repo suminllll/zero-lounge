@@ -4,6 +4,22 @@ import { FaInstagram } from 'react-icons/fa'
 import { IoShareOutline } from 'react-icons/io5'
 
 export default function SocialButtons() {
+  const copyToClipboard = async (text: string) => {
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(text)
+    } else {
+      const el = document.createElement('textarea')
+      el.value = text
+      el.style.position = 'fixed'
+      el.style.opacity = '0'
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+    }
+    alert('링크가 복사되었습니다.')
+  }
+
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -13,13 +29,11 @@ export default function SocialButtons() {
         })
       } catch (e) {
         if (e instanceof Error && e.name !== 'AbortError') {
-          await navigator.clipboard.writeText(window.location.href)
-          alert('링크가 복사되었습니다.')
+          await copyToClipboard(window.location.href)
         }
       }
     } else {
-      await navigator.clipboard.writeText(window.location.href)
-      alert('링크가 복사되었습니다.')
+      await copyToClipboard(window.location.href)
     }
   }
 

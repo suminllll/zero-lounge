@@ -11,10 +11,7 @@ export type Application = {
   date: string
   gender: string
   name: string
-  nickname: string
   birth_year: string
-  job: string
-  mbti: string
   photo_url: string | null
   contact: string
   referral: string

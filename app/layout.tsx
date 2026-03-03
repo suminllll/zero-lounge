@@ -3,6 +3,7 @@ import localFont from 'next/font/local'
 import './globals.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import QueryProvider from './components/QueryProvider'
 
 const suit = localFont({
   src: '../public/fonts/SUIT-Variable.ttf',
@@ -57,9 +58,11 @@ export default function RootLayout({
         className={`${suit.className} antialiased m-0 p-0 min-h-screen relative`}
         suppressHydrationWarning={true}
       >
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <QueryProvider>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </QueryProvider>
       </body>
     </html>
   )

@@ -21,6 +21,7 @@ export default function GallerySlider() {
   const [emblaRef] = useEmblaCarousel({ loop: false, align: 'start' })
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
+  const [loadedSet, setLoadedSet] = useState<Set<number>>(new Set())
 
   const openLightbox = (index: number) => {
     setLightboxIndex(index)
@@ -35,9 +36,12 @@ export default function GallerySlider() {
           {images.map((src, i) => (
             <div
               key={i}
-              className="shrink-0 w-[90%] h-[280px] relative rounded-2xl overflow-hidden cursor-pointer"
+              className="shrink-0 w-[90%] h-[280px] relative rounded-2xl overflow-hidden cursor-pointer bg-[#2a2220]"
               onClick={() => openLightbox(i)}
             >
+              {!loadedSet.has(i) && (
+                <div className="absolute inset-0 bg-[#2a2220] animate-pulse z-10" />
+              )}
               <Image
                 src={src}
                 alt={`gallery-${i}`}
@@ -45,6 +49,7 @@ export default function GallerySlider() {
                 className="object-cover"
                 quality={90}
                 sizes="80vw"
+                onLoad={() => setLoadedSet(prev => new Set(prev).add(i))}
               />
             </div>
           ))}

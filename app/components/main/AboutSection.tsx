@@ -24,7 +24,7 @@ const AboutSection = ({ showWine }: AboutSectionProps) => {
       </h1>
 
       <div className="py-12">
-        <div className="relative w-full h-[370px]  mx-auto">
+        <div className="relative w-full h-[370px]  mx-auto bg-[#2a2220]">
           <Image
             src={'/images/heroMain1.jpg'}
             alt={'heroMain1'}
@@ -74,7 +74,7 @@ const AboutSection = ({ showWine }: AboutSectionProps) => {
           편하게 이야기할 수 있는 밤이었을지도 모르니까요.
         </p>
 
-        <div className="relative w-full h-[481px]  mx-auto mt-20">
+        <div className="relative w-full h-[481px]  mx-auto mt-20 bg-[#2a2220]">
           <Image
             src={'/images/IMG_5056 1.png'}
             alt={'heroMain1'}

@@ -37,6 +37,11 @@ export default function ApplyPage() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [copied, setCopied] = useState(false)
+  const [partyFilter] = useState<string | null>(() =>
+    typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('party')
+      : null
+  )
 
   const handleCopyAccount = async () => {
     await navigator.clipboard.writeText('1002-164-275949')
@@ -142,6 +147,7 @@ export default function ApplyPage() {
     const event = eventsMap[dateStr]
     if (!event) return false
     if (partySettings[event.party_type] === false) return false
+    if (partyFilter && event.party_type !== partyFilter) return false
     const today = new Date().toISOString().split('T')[0]
     if (dateStr < today) return false
     const display = getDisplaySeats(event)

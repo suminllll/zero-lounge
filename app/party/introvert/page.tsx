@@ -4,7 +4,7 @@ export default function IntrovertPartyPage() {
   return (
     <main className="bg-secondary min-h-screen text-primary">
       {/* 헤더 이미지 */}
-      <div className="relative w-full h-[45vh]">
+      <div className="relative w-full h-[45vh] bg-[#2a2220]">
         <Image
           src="/images/cocktail1.jpeg"
           alt="내향인 파티"
@@ -70,7 +70,7 @@ export default function IntrovertPartyPage() {
       {/* 참가신청 버튼 */}
       <div className="px-5 pb-10">
         <a
-          href="/apply"
+          href="/apply?party=introvert"
           className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] tracking-wide"
           style={{ backgroundColor: '#c6beb8' }}
         >

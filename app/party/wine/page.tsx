@@ -1,11 +1,9 @@
 import Image from 'next/image'
-import Link from 'next/link'
-import { IoChevronBack } from 'react-icons/io5'
 
 export default function WinePartyPage() {
   return (
     <main className="bg-secondary min-h-screen text-primary">
-      {/* 헤더 */}
+      {/* 헤더 이미지 */}
       <div className="relative w-full h-[45vh]">
         <Image
           src="/images/wine.jpeg"
@@ -17,9 +15,6 @@ export default function WinePartyPage() {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-black/30" />
-        <Link href="/" className="absolute top-4 left-4 text-white z-10 p-1">
-          <IoChevronBack size={28} />
-        </Link>
         <div className="absolute bottom-6 left-5 z-10">
           <h1 className="text-2xl font-bold text-white">와인 파티</h1>
         </div>
@@ -30,9 +25,9 @@ export default function WinePartyPage() {
       <div className="px-5 py-10 flex flex-col gap-8">
         <div className="pt-8 flex flex-col gap-6 text-[#c6beb8] text-[15px] leading-7 font-light">
           <p>
-            와인과 함께 대화가 깊어지는 소셜링이에요.
+            와인과 함께 하는 대화형 소셜링이에요.
             <br />
-            편안한 분위기에서 새로운 사람들과 이야기해요.
+            편안한 분위기에서 다양한 사람들과 이야기해요.
           </p>
           <p>
             혼자 오셔도 괜찮아요.
@@ -41,28 +36,27 @@ export default function WinePartyPage() {
           </p>
         </div>
 
-        <div className="bg-secondary rounded-3xl py-8 flex flex-col gap-6 text-primary">
+        <div className="bg-secondary rounded-3xl py-8 flex flex-col gap-6 text-primary text-center">
           <div>
             <p className="font-bold text-base">제공 메뉴</p>
             <p className="text-sm mt-1 font-light leading-6">
-              훈제 오리고기
+              과일 플래터
               <br />
-              떡볶이
-              <br />
-              소불고기 볶음밥
+              치즈 플래터
               <br />
               유자 샐러드
+              <br />
+              핑거푸드
             </p>
           </div>
-          <div className="text-right">
+          <div>
             <p className="font-bold text-base">제공 주류</p>
-            <p className="text-sm mt-1 font-light">
-              레드와인 / 화이트 와인
-              <br />
-              소주 / 맥주 무제한
-              <br />
-              (논알콜도 준비되어 있어요.)
-            </p>
+            <p className="text-sm mt-1 font-light">레드와인 / 화이트 와인 / 논알콜 무제한 제공</p>
+          </div>
+
+          <div>
+            <p className="font-bold text-base">참가비</p>
+            <p className="text-sm mt-1 font-light leading-6">49,000원</p>
           </div>
         </div>
       </div>

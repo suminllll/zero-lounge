@@ -34,8 +34,14 @@ create table events (
   date text not null unique,
   time text not null,
   female_seats int not null default 0,
-  male_seats int not null default 0
+  male_seats int not null default 0,
+  party_type text not null default 'introvert' check (party_type in ('introvert', 'wine')),
+  price int not null default 45000
 );
+
+-- 기존 events 테이블에 컬럼 추가 (이미 테이블이 있는 경우 실행)
+-- alter table events add column if not exists party_type text not null default 'introvert' check (party_type in ('introvert', 'wine'));
+-- alter table events add column if not exists price int not null default 45000;
 
 alter table events enable row level security;
 

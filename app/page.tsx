@@ -1,19 +1,21 @@
-import Link from 'next/link'
 import AboutSection from './components/main/AboutSection'
 import HeroSection from './components/main/HeroSection'
+import ScheduleButton from './components/main/ScheduleButton'
+import { supabase, type PartySetting } from '@/lib/supabase'
 
-export default function Home() {
+export default async function Home() {
+  const { data } = await supabase.from('party_settings').select('*')
+  const settings = ((data as PartySetting[]) ?? []).reduce<Record<string, boolean>>(
+    (acc, s) => ({ ...acc, [s.party_type]: s.is_visible }),
+    {}
+  )
+  const showWine = settings['wine'] !== false
+
   return (
     <div>
       <HeroSection />
-      <AboutSection />
-      <Link
-        href="/apply"
-        className="fixed bottom-6 w-[90%] left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-full font-bold text-secondary text-[17px] text-center shadow-lg whitespace-nowrap"
-        style={{ backgroundColor: '#c6beb8' }}
-      >
-        소셜링 신청하기
-      </Link>
+      <AboutSection showWine={showWine} />
+      <ScheduleButton showWine={showWine} />
     </div>
   )
 }

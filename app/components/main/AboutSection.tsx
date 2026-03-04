@@ -3,7 +3,11 @@ import GallerySliderWrapper from './GallerySliderWrapper'
 import SocialButtons from './SocialButtons'
 import PartyCards from './PartyCards'
 
-const AboutSection = () => {
+interface AboutSectionProps {
+  showWine: boolean
+}
+
+const AboutSection = ({ showWine }: AboutSectionProps) => {
   return (
     <section className=" bg-secondary py-10 gap-20">
       <h1 className="font-medium text-[#c6beb8] text-[18px] leading-7 break-all whitespace-pre-wrap px-[15px] mb-20">
@@ -115,18 +119,26 @@ const AboutSection = () => {
                 (자세한 위치는 예약 확정시 보내드려요)
               </p>
             </div>
-            <div>
-              <p className="font-bold text-base">제공 메뉴</p>
-              <p className="text-sm mt-1 font-light leading-6">
-                오리고기 / 볶음밥 / 떡볶이 / 샐러드
-              </p>
-            </div>
-            <div>
-              <p className="font-bold text-base">제공 주류</p>
-              <p className="text-sm mt-1 font-light leading-6">
-                말차 하이볼 / 얼그레이 하이볼 /<br /> 소주 / 맥주 무제한
-              </p>
-            </div>
+            {!showWine && (
+              <>
+                <div>
+                  <p className="font-bold text-base">제공 메뉴</p>
+                  <p className="text-sm mt-1 font-light leading-6">
+                    오리고기 / 볶음밥 / 떡볶이 / 샐러드
+                  </p>
+                </div>
+                <div>
+                  <p className="font-bold text-base">제공 주류</p>
+                  <p className="text-sm mt-1 font-light leading-6">
+                    말차 하이볼 / 얼그레이 하이볼 /<br /> 소주 / 맥주 무제한
+                  </p>
+                </div>
+                <div>
+                  <p className="font-bold text-base">참가비</p>
+                  <p className="text-sm mt-1 font-light leading-6">45,000원 </p>
+                </div>
+              </>
+            )}
             <div>
               <p className="font-bold text-base">일정</p>
               <p className="text-sm mt-1 font-light leading-6">
@@ -154,7 +166,6 @@ const AboutSection = () => {
             </div>
           </div>
         </div>
-
         {/* 후기 섹션 */}
         <div className="py-16 px-5">
           <h2 className="text-center text-[#f5e2d4] text-[22px] font-bold leading-snug mb-12">
@@ -195,6 +206,11 @@ const AboutSection = () => {
         </div>
 
         <GallerySliderWrapper />
+
+        {/* 카드섹션 */}
+        <div id="party-cards" className="w-full flex justify-center mt-25">
+          {showWine && <PartyCards />}
+        </div>
 
         <div className="my-30 px-5">
           <p className=" text-[#f5e2d4] text-[30px] font-bold leading-snug mb-2">QnA</p>
@@ -240,8 +256,6 @@ const AboutSection = () => {
           <p className="font-bold">&lt; 대화가 남는 곳 &gt;</p>
         </div> */}
 
-        {/* 카드섹션 */}
-        <PartyCards />
         <SocialButtons />
       </div>
     </section>

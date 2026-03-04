@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { IoChevronBack } from 'react-icons/io5'
-import { supabase, getDisplaySeats, type Event } from '@/lib/supabase'
+import { supabase, getDisplaySeats, PARTY_LABELS } from '@/lib/supabase'
+import { useEvents } from '@/hooks/useEvents'
+import { usePartySettings } from '@/hooks/usePartySettings'
 
 type FormData = {
   date: string
@@ -42,18 +44,9 @@ export default function ApplyPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  // Supabase에서 이벤트 불러오기
-  const [events, setEvents] = useState<Event[]>([])
-  const [eventsLoading, setEventsLoading] = useState(true)
-
-  useEffect(() => {
-    async function loadEvents() {
-      const { data } = await supabase.from('events').select('*').order('date', { ascending: true })
-      if (data) setEvents(data as Event[])
-      setEventsLoading(false)
-    }
-    loadEvents()
-  }, [])
+  // Supabase에서 이벤트 + 파티 설정 불러오기
+  const { data: events = [], isLoading: eventsLoading } = useEvents()
+  const { data: partySettings = {} } = usePartySettings()
 
   // 날짜 → 이벤트 맵
   const eventsMap = Object.fromEntries(events.map(e => [e.date, e]))
@@ -148,6 +141,7 @@ export default function ApplyPage() {
   const isDateSelectable = (dateStr: string) => {
     const event = eventsMap[dateStr]
     if (!event) return false
+    if (partySettings[event.party_type] === false) return false
     const today = new Date().toISOString().split('T')[0]
     if (dateStr < today) return false
     const display = getDisplaySeats(event)
@@ -290,20 +284,28 @@ export default function ApplyPage() {
               </>
             )}
             {selectedEvent && displaySeats && (
-              <div className="mt-6">
-                <div className="flex gap-4 mb-4">
-                  <div className="flex flex-col gap-2 items-center justify-center w-full bg-primary/10 rounded-full py-1.5 px-4 text-center">
-                    <div className="flex gap-2 items-center">
-                      <p className="text-[#8F8781] text-xs">시작 시간</p>
-                      <p className="text-[#f5e2d4] text-l font-bold">{selectedEvent.time}</p>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                      <p className="text-[#8F8781] text-xs">여성 잔여</p>
-                      <p className="text-[#f5e2d4] text-l font-bold">{displaySeats.female} 자리</p>
-                      <p className="text-[#8F8781] text-xs">/ 남성 잔여</p>
-                      <p className="text-[#f5e2d4] text-l font-bold">{displaySeats.male} 자리</p>
-                    </div>
-                  </div>
+              <div className="mt-6 flex flex-col gap-2">
+                <div className="bg-primary/10 rounded-2xl px-4 py-3 flex items-center justify-between">
+                  <p className="text-[#8F8781] text-xs">파티 종류</p>
+                  <p className="text-[#f5e2d4] text-sm font-medium">
+                    {PARTY_LABELS[selectedEvent.party_type]}
+                  </p>
+                </div>
+                <div className="bg-primary/10 rounded-2xl px-4 py-3 flex items-center justify-between">
+                  <p className="text-[#8F8781] text-xs">참가비</p>
+                  <p className="text-[#f5e2d4] text-sm font-medium">
+                    {selectedEvent.price.toLocaleString()}원
+                  </p>
+                </div>
+                <div className="bg-primary/10 rounded-2xl px-4 py-3 flex items-center justify-between">
+                  <p className="text-[#8F8781] text-xs">시작 시간</p>
+                  <p className="text-[#f5e2d4] text-sm font-medium">{selectedEvent.time}</p>
+                </div>
+                <div className="bg-primary/10 rounded-2xl px-4 py-3 flex items-center justify-between">
+                  <p className="text-[#8F8781] text-xs">잔여 좌석</p>
+                  <p className="text-[#f5e2d4] text-sm font-medium">
+                    여성 {displaySeats.female}자리 · 남성 {displaySeats.male}자리
+                  </p>
                 </div>
               </div>
             )}
@@ -547,7 +549,14 @@ export default function ApplyPage() {
             <div className="bg-primary/10 rounded-2xl p-6 text-[#c6beb8] text-[14px] leading-7 mb-8">
               <div className="text-center mb-6">
                 <p className="text-[#8F8781] text-xs mb-2">참가비</p>
-                <p className="text-[#f5e2d4] text-4xl font-bold">45,000원</p>
+                <p className="text-[#f5e2d4] text-4xl font-bold">
+                  {selectedEvent ? selectedEvent.price.toLocaleString() : '45,000'}원
+                </p>
+                {selectedEvent && (
+                  <p className="text-[#8F8781] text-xs mt-1">
+                    {PARTY_LABELS[selectedEvent.party_type]}
+                  </p>
+                )}
               </div>
               <div className="border-t border-primary/20 pt-5">
                 <p className="text-[#8F8781] text-xs mb-1">입금 계좌</p>
@@ -564,7 +573,6 @@ export default function ApplyPage() {
                 </div>
               </div>
               <div className="border-t border-primary/20 mt-5 pt-4 text-xs leading-6">
-                <p>입금 완료 시 신청이 확정됩니다.</p>
                 <p className="text-[#8F8781]">
                   * 입금이 지연될 경우, 신청서를 다시 작성하셔야 합니다.
                 </p>
@@ -597,9 +605,9 @@ export default function ApplyPage() {
                 <br />
                 팔로우한 뒤,
                 <br />
-                아래 내용을 DM으로 보내주셔야
+                아래 내용을 DM으로 보내주시면
                 <br />
-                신청이 완료됩니다.
+                확정 안내 메세지를 보내드립니다.
               </p>
               <div className="bg-secondary/60 rounded-xl p-4 mb-4">
                 <p className="text-[#f5e2d4] font-semibold">입금자명, 참여 날짜</p>

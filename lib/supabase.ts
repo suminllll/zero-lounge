@@ -18,6 +18,8 @@ export type Application = {
   status: 'pending' | 'confirmed' | 'rejected'
 }
 
+export type PartyType = 'introvert' | 'wine'
+
 export type Event = {
   id: number
   created_at: string
@@ -25,6 +27,13 @@ export type Event = {
   time: string
   female_seats: number
   male_seats: number
+  party_type: PartyType
+  price: number
+}
+
+export const PARTY_LABELS: Record<PartyType, string> = {
+  introvert: '내향인 파티',
+  wine: '와인 파티',
 }
 
 export type PartySetting = {
@@ -47,10 +56,12 @@ export function getDisplaySeats(event: Event): { female: number; male: number } 
   if (event.date === today) {
     const [h, m] = event.time.split(':').map(Number)
     const now = new Date()
-    const eventTime = new Date()
-    eventTime.setHours(h, m, 0, 0)
+    // 이벤트 시간은 KST(UTC+9) 기준 → UTC로 변환해 서버/클라이언트 일치
+    const eventUTC = new Date()
+    const utcHour = h - 9
+    eventUTC.setUTCHours(utcHour < 0 ? utcHour + 24 : utcHour, m, 0, 0)
 
-    if (now >= eventTime) return { female: 0, male: 0 }
+    if (now >= eventUTC) return { female: 0, male: 0 }
 
     return {
       female: Math.max(0, event.female_seats - 2),

@@ -14,7 +14,7 @@ export default function NoticeSection({ showWine }: NoticeSectionProps) {
           <p className="text-base mt-1 font-light leading-6">
             공덕역-애오개역 사이
             <br />
-            <span className="font-sm">(자세한 위치는 예약 확정시 보내드려요)</span>
+            <span className="text-sm">(자세한 위치는 예약 확정시 보내드려요)</span>
           </p>
         </div>
 

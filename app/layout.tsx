@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
+import Image from 'next/image'
 import './globals.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
@@ -70,6 +71,17 @@ export default function RootLayout({
         className={`${suit.className} antialiased m-0 p-0 min-h-screen relative`}
         suppressHydrationWarning={true}
       >
+        <div className="fixed top-0 left-0 w-full h-screen -z-10 overflow-hidden md:left-1/2 md:-translate-x-1/2 md:max-w-[390px]">
+          <Image
+            src="/images/bgImgae.jpeg"
+            alt="background"
+            fill
+            className="object-cover object-center"
+            quality={85}
+            sizes="390px"
+            priority
+          />
+        </div>
         <QueryProvider>
           <Header />
           <main>{children}</main>

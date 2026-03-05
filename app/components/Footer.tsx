@@ -15,7 +15,7 @@ export default function Footer() {
       <footer className="w-full bg-secondary text-primary">
         <div className="mx-auto max-w-7xl px-4 py-8">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-xs">&copy; 2025 ZERO LOUNGE. All rights reserved.</p>
+            <p className="text-xs">&copy; 2026 ZERO LOUNGE. All rights reserved.</p>
             <div className="flex gap-6">
               <button
                 onClick={() => setOpenModal('privacy')}

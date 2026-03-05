@@ -13,7 +13,7 @@ interface AboutSectionProps {
 
 const AboutSection = ({ showWine }: AboutSectionProps) => {
   return (
-    <section className="pt-30 pb-30 flex flex-col gap-20">
+    <section className="pt-30 pb-10 flex flex-col gap-20">
       <IntroSection />
 
       <WhoSection />

@@ -32,17 +32,17 @@ export default function IntroSection() {
           </p>
         </div>
 
-        <p className="mt-20 pl-[4vw] text-base leading-7  font-medium">
+        <p className="mt-20 text-base leading-6 px-[15px]  font-medium">
           요즘은 사람을
           <br /> 어디에서 만나야 할지 잘 모르겠어요.
           <br />
           <br />
           소개팅은 부담스럽고, <br />
           시끄러운 술자리는 피곤하고,
-          <br />
+          <br /> <br />
           그렇다고 가만히 있자니
           <br />
-          괜히 마음이 허전해지는 날이 있죠.
+          괜히 마음이 공허해지는 날이 있죠.
           <br />
           <br />
           그래서 우리는
@@ -50,13 +50,8 @@ export default function IntroSection() {
           조금 다른 자리를 준비했습니다.
           <br />
           <br />
-          속도를 강요하지 않고,
-          <br />
-          억지로 친해지지 않아도 되는 분위기.
-          <br />
-          <br />
           결국 남는 건<br />
-          사람과 사람 사이의 대화입니다.
+          사람과 사람 사이의 대화이기 때문이에요.
           <br />
           <br />
           어쩌면,
@@ -64,7 +59,7 @@ export default function IntroSection() {
           요즘 우리가 찾고 있던 건<br />
           거창한 만남이 아니라
           <br />
-          편하게 이야기할 수 있는 밤이었을지도 모르니까요.
+          편하게 이야기할 수 있는 자리일지도 모르니까요.
         </p>
 
         <div className="relative w-full h-[481px] mx-auto mt-20 bg-[#2a2220]">
@@ -78,7 +73,7 @@ export default function IntroSection() {
           />
           <div className="absolute inset-0 bg-black/25" />
           <p className="absolute top-3 right-6 text-xs text-white">ZERO LOUNGE</p>
-          <div className="absolute bottom-3 right-6 whitespace-nowrap font-light text-[#d0c4bc]">
+          <div className="absolute bottom-7 right-5 whitespace-nowrap font-light text-[#d0c4bc]">
             <p className="font-bold text-xl"> 이런 시간을 준비했어요.</p>
             <div className="text-right text-sm font-light mt-3">
               아이스 브레이킹 대화 주제

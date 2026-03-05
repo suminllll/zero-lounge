@@ -22,13 +22,11 @@ export default function QnaSection() {
     <div className="my-30 px-5">
       <p className="text-3xl font-bold leading-snug mb-2">QnA</p>
       {QNA_LIST.map((item, i) => (
-        <p key={i} className="font-medium">
+        <div key={i} className="font-medium mb-2">
           <br />
-          Q. {item.q}
-          <br />
-          A. {item.a}
-          <br />
-        </p>
+          <p className="mb-1"> Q. {item.q}</p>
+          <p className="text-sm"> A. {item.a}</p>
+        </div>
       ))}
     </div>
   )

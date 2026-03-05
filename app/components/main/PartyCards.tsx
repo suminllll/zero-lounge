@@ -18,7 +18,7 @@ export default function PartyCards() {
           />
           <div className="flex flex-col justify-between gap-4 py-6 text-secondary font-bold px-3">
             <p className="text-lg font-bold">내향인 파티</p>
-            <p className="mt-1.5 text-sm/6 text-secondary/82">
+            <p className="mt-1.5 text-sm/5 text-secondary/82">
               말차 하이볼 / 레몬 하이볼 <br /> 소주 / 맥주 / 논알콜
             </p>
           </div>

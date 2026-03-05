@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
 import Header from './components/Header'
-import Footer from './components/Footer'
+import ConditionalFooter from './components/ConditionalFooter'
 import QueryProvider from './components/QueryProvider'
 
 const suit = localFont({
@@ -82,9 +82,11 @@ export default function RootLayout({
           />
         </div> */}
         <QueryProvider>
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          <div className="relative mx-auto max-w-[390px]">
+            <Header />
+            <main>{children}</main>
+            <ConditionalFooter />
+          </div>
         </QueryProvider>
       </body>
     </html>

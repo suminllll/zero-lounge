@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
-import Image from 'next/image'
 import './globals.css'
 import Header from './components/Header'
-import Footer from './components/Footer'
+import ConditionalFooter from './components/ConditionalFooter'
 import QueryProvider from './components/QueryProvider'
 
 const suit = localFont({
@@ -68,10 +67,10 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning={true}>
       <body
-        className={`${suit.className} antialiased m-0 p-0 min-h-screen relative`}
+        className={`${suit.className} antialiased m-0 p-0 min-h-screen relative bg-secondary`}
         suppressHydrationWarning={true}
       >
-        <div className="fixed top-0 left-0 w-full h-screen -z-10 overflow-hidden md:left-1/2 md:-translate-x-1/2 md:max-w-[390px]">
+        {/* <div className="fixed top-0 left-0 w-full h-screen -z-10 overflow-hidden md:left-1/2 md:-translate-x-1/2 md:max-w-[390px]">
           <Image
             src="/images/bgImgae.jpeg"
             alt="background"
@@ -81,11 +80,13 @@ export default function RootLayout({
             sizes="390px"
             priority
           />
-        </div>
+        </div> */}
         <QueryProvider>
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          <div className="relative mx-auto max-w-[390px]">
+            <Header />
+            <main>{children}</main>
+            <ConditionalFooter />
+          </div>
         </QueryProvider>
       </body>
     </html>

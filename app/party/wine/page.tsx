@@ -3,7 +3,7 @@ import PartyApplyButton from '@/app/components/party/PartyApplyButton'
 
 export default function WinePartyPage() {
   return (
-    <main className="min-h-screen relative text-secondary">
+    <main className="min-h-screen relative text-primary">
       {/* 헤더 이미지 */}
       <div className="relative w-full h-[45vh] bg-[#2a2220]">
         <Image
@@ -37,7 +37,7 @@ export default function WinePartyPage() {
           </p>
         </div>
 
-        <div className="border-secondary rounded-3xl py-8 flex flex-col gap-8 text-secondary text-center">
+        <div className="border border-primary/30 rounded-3xl py-8 flex flex-col gap-8 text-center">
           <div>
             <p className="font-bold ">제공 메뉴</p>
             <p className="text-sm mt-1  leading-6">

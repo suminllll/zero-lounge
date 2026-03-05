@@ -2,10 +2,13 @@ import type { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-    },
-    sitemap: 'https://zerolounge.kr',
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/admin'],
+      },
+    ],
+    sitemap: 'https://zerolounge.kr/sitemap.xml',
   }
 }

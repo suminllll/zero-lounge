@@ -13,7 +13,7 @@ const REVIEWS = [
 
 export default function ReviewSection() {
   return (
-    <div className="py-16 px-5">
+    <div className="pt-16 px-5">
       <h2 className="text-center text-2xl font-bold leading-snug mb-12">
         1,000명 이상 다녀가신 소셜링. <br />
         게스트 분들이

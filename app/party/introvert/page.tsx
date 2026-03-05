@@ -1,24 +1,9 @@
 import Image from 'next/image'
 import PartyApplyButton from '@/app/components/party/PartyApplyButton'
 
-const BG = (
-  <div className="fixed inset-0 -z-10">
-    <Image
-      src="/images/bgImgae.jpeg"
-      alt="background"
-      fill
-      className="object-cover object-center"
-      quality={85}
-      sizes="390px"
-    />
-  </div>
-)
-
 export default function IntrovertPartyPage() {
   return (
     <main className="min-h-screen relative text-secondary">
-      {BG}
-
       {/* 헤더 이미지 */}
       <div className="relative w-full h-[45vh] bg-[#2a2220]">
         <Image

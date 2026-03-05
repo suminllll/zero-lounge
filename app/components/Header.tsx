@@ -24,7 +24,7 @@ export default function Header() {
 
   return (
     <header
-      className={`${isPartyPage ? 'fixed' : 'absolute'} top-0 left-0 w-full h-14 text-[#d2cdc3] z-20 transition-colors duration-300 ${
+      className={`${isPartyPage ? 'fixed' : 'absolute'} top-0 left-0 w-full h-14 text-[#d2cdc3] z-20 transition-colors duration-300 md:left-1/2 md:-translate-x-1/2 md:max-w-[390px] ${
         isPartyPage && scrolled ? 'bg-secondary' : 'bg-transparent'
       }`}
     >

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { IoChevronBack } from 'react-icons/io5'
 import { supabase, getDisplaySeats, PARTY_LABELS } from '@/lib/supabase'
@@ -22,18 +21,6 @@ type FormData = {
 const TOTAL_STEPS = 10
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
-const BgImage = () => (
-  <div className="fixed inset-0 -z-10">
-    <Image
-      src="/images/bgImgae.jpeg"
-      alt="background"
-      fill
-      className="object-cover object-center"
-      quality={85}
-      sizes="390px"
-    />
-  </div>
-)
 
 export default function ApplyPage() {
   const [step, setStep] = useState(1)
@@ -184,7 +171,6 @@ export default function ApplyPage() {
   if (isLoading) {
     return (
       <main className="relative h-dvh flex flex-col items-center justify-center gap-6 text-secondary">
-        <BgImage />
         <div className="flex flex-col items-center gap-5">
           <div className="w-10 h-10 border-2 border-secondary/20 border-t-secondary rounded-full animate-spin" />
           <p className="text-sm">제출 중...</p>
@@ -196,7 +182,6 @@ export default function ApplyPage() {
   if (isComplete) {
     return (
       <div className="relative h-dvh flex flex-col items-center justify-center gap-6 px-8 text-center text-secondary">
-        <BgImage />
         <h2 className="text-xl font-bold">제로라운지 신청 완료</h2>
 
         <p className="text-[#8F8781] text-sm leading-6">
@@ -227,8 +212,6 @@ export default function ApplyPage() {
 
   return (
     <div className="relative h-dvh flex flex-col text-secondary">
-      <BgImage />
-
       {/* 상단 진행바 */}
       <div className="pt-16 pb-3 px-5 shrink-0">
         <div className="flex items-center gap-3">

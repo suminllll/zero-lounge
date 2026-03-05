@@ -609,13 +609,13 @@ export default function ApplyPage() {
                 </p>
               </div>
             </div>
-            <button
+            {/* <button
               onClick={() => window.open('https://qr.kakaopay.com/Ej9ND22l6', '_blank')}
               className="block w-full py-4 mb-3 rounded-2xl text-center font-bold text-secondary text-base"
               style={{ backgroundColor: '#c6beb8' }}
             >
               카카오페이로 송금하고 오기
-            </button>
+            </button> */}
             <button
               onClick={next}
               className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-base"

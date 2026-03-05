@@ -13,9 +13,10 @@ import { revalidateMainPage } from '@/app/actions/revalidate'
 import { useApplications } from '@/hooks/useApplications'
 import { useEvents } from '@/hooks/useEvents'
 import { useAdminPartySettings } from '@/hooks/useAdminPartySettings'
+import { useErrorLogs } from '@/hooks/useErrorLogs'
 import Image from 'next/image'
 
-type AdminTab = 'applications' | 'events' | 'parties'
+type AdminTab = 'applications' | 'events' | 'parties' | 'errors'
 
 const STATUS_LABEL: Record<Application['status'], string> = {
   pending: '대기',
@@ -33,6 +34,7 @@ const TAB_ITEMS: { key: AdminTab; label: string }[] = [
   { key: 'applications', label: '신청자' },
   { key: 'events', label: '추가' },
   { key: 'parties', label: '파티' },
+  { key: 'errors', label: '로그' },
 ]
 
 const Spinner = () => (
@@ -50,7 +52,7 @@ interface DetailModalProps {
 const DetailModal = ({ app, onClose, onUpdateStatus }: DetailModalProps) => (
   <div className="fixed inset-0 bg-black/70 z-50 flex items-end" onClick={onClose}>
     <div
-      className="bg-[#1a1210] w-full rounded-t-3xl p-5 pb-10 max-h-[90vh] overflow-y-auto"
+      className="bg-secondary w-full rounded-t-3xl p-5 pb-10 max-h-[90vh] overflow-y-auto"
       onClick={e => e.stopPropagation()}
     >
       <div className="w-10 h-1 bg-[#3a3230] rounded-full mx-auto mb-5" />
@@ -108,7 +110,7 @@ const DetailModal = ({ app, onClose, onUpdateStatus }: DetailModalProps) => (
           <button
             key={s}
             onClick={() => onUpdateStatus(app.id, s)}
-            className={`py-4 rounded-2xl text-sm font-bold ${s === 'rejected' ? 'text-white' : 'text-[#1a1210]'} ${app.status === s ? 'ring-2 ring-white/30' : ''}`}
+            className={`py-4 rounded-2xl text-sm font-bold ${s === 'rejected' ? 'text-white' : 'text-secondary'} ${app.status === s ? 'ring-2 ring-white/30' : ''}`}
             style={{ backgroundColor: STATUS_COLOR[s] }}
           >
             {STATUS_LABEL[s]}
@@ -120,10 +122,15 @@ const DetailModal = ({ app, onClose, onUpdateStatus }: DetailModalProps) => (
 )
 
 export default function AdminPage() {
-  const [isAuthed, setIsAuthed] = useState(false)
+  const [isAuthed, setIsAuthed] = useState(() => {
+    if (typeof document === 'undefined') return false
+    return document.cookie.split(';').some(c => c.trim() === 'admin_auth=1')
+  })
   const [password, setPassword] = useState('')
   const [passwordError, setPasswordError] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
   const [tab, setTab] = useState<AdminTab>('applications')
+  const [copiedId, setCopiedId] = useState<number | null>(null)
 
   const queryClient = useQueryClient()
 
@@ -164,13 +171,28 @@ export default function AdminPage() {
   const { data: partySettings = [], isLoading: partyLoading } = useAdminPartySettings(
     tab === 'parties'
   )
+  const { data: errorLogs = [], isLoading: logsLoading } = useErrorLogs(tab === 'errors')
 
   const handleLogin = () => {
     const adminPw = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin1234'
     if (password === adminPw) {
       setIsAuthed(true)
       setPasswordError(false)
+      if (rememberMe) {
+        document.cookie = `admin_auth=1; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Strict`
+      }
     } else setPasswordError(true)
+  }
+
+  const handleCopy = async (app: Application, e: React.MouseEvent) => {
+    e.stopPropagation()
+    const gender = app.gender === '여성' ? '여' : '남'
+    const nickname = app.name.includes('/')
+      ? app.name.split('/').slice(1).join('/').trim()
+      : app.name.trim()
+    await navigator.clipboard.writeText(`${gender}/${nickname}/${app.birth_year} (인스타)`)
+    setCopiedId(app.id)
+    setTimeout(() => setCopiedId(null), 2000)
   }
 
   const updateStatus = async (id: number, status: Application['status']) => {
@@ -216,10 +238,16 @@ export default function AdminPage() {
     await revalidateMainPage()
   }
 
+  const clearErrorLogs = async () => {
+    if (!confirm('모든 로그를 삭제할까요?')) return
+    await supabase.from('error_logs').delete().neq('id', 0)
+    queryClient.invalidateQueries({ queryKey: ['error_logs'] })
+  }
+
   // ── 로그인 ────────────────────────────────
-  if (isAuthed) {
+  if (!isAuthed) {
     return (
-      <main className="min-h-screen bg-[#1a1210] flex flex-col items-center justify-center px-6">
+      <main className="min-h-screen bg-secondary flex flex-col items-center justify-center px-6">
         <p className="text-[#c6beb8] text-2xl font-bold tracking-widest mb-2">ZERO LOUNGE</p>
         <p className="text-[#8F8781] text-sm mb-10">관리자</p>
         <div className="w-full max-w-xs">
@@ -234,9 +262,18 @@ export default function AdminPage() {
           {passwordError && (
             <p className="text-red-400 text-sm mb-3 text-center">비밀번호가 틀렸습니다.</p>
           )}
+          <label className="flex items-center gap-2 mb-4 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={e => setRememberMe(e.target.checked)}
+              className="w-4 h-4 accent-[#c6beb8]"
+            />
+            <span className="text-[#8F8781] text-sm">로그인 상태 유지</span>
+          </label>
           <button
             onClick={handleLogin}
-            className="w-full py-4 rounded-2xl font-bold text-[#1a1210] text-base"
+            className="w-full py-4 rounded-2xl font-bold text-secondary text-base"
             style={{ backgroundColor: '#c6beb8' }}
           >
             로그인
@@ -248,9 +285,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-black flex justify-center">
-      <main
-        className="w-full max-w-[390px] min-h-screen bg-[#1a1210] text-[#f5e2d4] relative pb-10"
-      >
+      <main className="w-full max-w-[390px] min-h-screen bg-secondary text-[#f5e2d4] relative pb-10">
         {selectedApp && (
           <DetailModal
             app={selectedApp}
@@ -260,7 +295,7 @@ export default function AdminPage() {
         )}
 
         {/* 헤더 */}
-        <div className="sticky top-0 bg-[#1a1210] z-10">
+        <div className="sticky top-0 bg-secondary z-10">
           <div className="px-5 pt-5 pb-3">
             <p className="text-[#c6beb8] font-bold text-xl tracking-widest">ADMIN</p>
           </div>
@@ -310,7 +345,7 @@ export default function AdminPage() {
               </select>
               <button
                 onClick={() => refetchApplications()}
-                className="bg-[#c6beb8] text-[#1a1210] rounded-xl py-3 text-sm font-bold"
+                className="bg-[#c6beb8] text-secondary rounded-xl py-3 text-sm font-bold"
               >
                 조회
               </button>
@@ -338,18 +373,18 @@ export default function AdminPage() {
             ) : (
               <div className="px-4 flex flex-col gap-2 pb-4">
                 {applications.map(app => (
-                  <button
+                  <div
                     key={app.id}
                     onClick={() => setSelectedApp(app)}
-                    className="w-full bg-[#2a2220] rounded-2xl p-4 text-left flex items-center gap-3 active:opacity-70"
+                    className="w-full bg-[#2a2220] rounded-2xl p-4 text-left flex items-center gap-3 active:opacity-70 cursor-pointer"
                   >
                     {app.photo_url ? (
                       <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0">
-                        <Image src={app.photo_url} alt="app.photo_url" fill />
+                        <Image src={app.photo_url} alt={app.name} fill className="object-cover" />
                       </div>
                     ) : (
-                      <div className="w-14 h-14 rounded-full bg-[#3a3230] flex items-center justify-center shrink-0">
-                        <span className="text-[#8F8781] text-xl">{app.name.charAt(0)}</span>
+                      <div className="w-10 h-10 rounded-full bg-[#3a3230] flex items-center justify-center shrink-0">
+                        <span className="text-[#8F8781] text-base">{app.name.charAt(0)}</span>
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
@@ -370,7 +405,18 @@ export default function AdminPage() {
                       </p>
                       <p className="text-[#8F8781] text-xs truncate mt-0.5">{app.birth_year}</p>
                     </div>
-                  </button>
+                    {/* 복사 버튼 */}
+                    <button
+                      onClick={e => handleCopy(app, e)}
+                      className="shrink-0 text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors"
+                      style={{
+                        backgroundColor: copiedId === app.id ? '#4ade80' : '#3a3230',
+                        color: copiedId === app.id ? '#1a1210' : '#c6beb8',
+                      }}
+                    >
+                      {copiedId === app.id ? '복사됨' : '복사'}
+                    </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -389,13 +435,13 @@ export default function AdminPage() {
                     type="date"
                     value={newEvent.date}
                     onChange={e => setNewEvent(p => ({ ...p, date: e.target.value }))}
-                    className="bg-[#1a1210] rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
+                    className="bg-secondary rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
                   />
                   <input
                     type="time"
                     value={newEvent.time}
                     onChange={e => setNewEvent(p => ({ ...p, time: e.target.value }))}
-                    className="bg-[#1a1210] rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
+                    className="bg-secondary rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
@@ -408,7 +454,7 @@ export default function AdminPage() {
                         price: e.target.value === 'introvert' ? 45000 : 49000,
                       }))
                     }
-                    className="bg-[#1a1210] rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
+                    className="bg-secondary rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
                   >
                     <option value="introvert">내향인 파티</option>
                     <option value="wine">와인 파티</option>
@@ -427,7 +473,7 @@ export default function AdminPage() {
                         setNewEvent(p => ({ ...p, price: 49000 }))
                       else setNewEvent(p => ({ ...p, price: 0 }))
                     }}
-                    className="bg-[#1a1210] rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
+                    className="bg-secondary rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
                   >
                     <option value="45000">45,000원</option>
                     <option value="49000">49,000원</option>
@@ -435,7 +481,7 @@ export default function AdminPage() {
                   </select>
                 </div>
                 {newEvent.price !== 45000 && newEvent.price !== 49000 && (
-                  <div className="bg-[#1a1210] rounded-xl px-3 py-3 flex items-center gap-2">
+                  <div className="bg-secondary rounded-xl px-3 py-3 flex items-center gap-2">
                     <span className="text-[#8F8781] text-xs shrink-0">직접입력</span>
                     <input
                       type="number"
@@ -447,7 +493,7 @@ export default function AdminPage() {
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-[#1a1210] rounded-xl px-3 py-3 flex items-center gap-2">
+                  <div className="bg-secondary rounded-xl px-3 py-3 flex items-center gap-2">
                     <span className="text-[#8F8781] text-xs">여성</span>
                     <input
                       type="number"
@@ -458,7 +504,7 @@ export default function AdminPage() {
                       className="flex-1 bg-transparent text-[#f5e2d4] text-sm outline-none min-w-0"
                     />
                   </div>
-                  <div className="bg-[#1a1210] rounded-xl px-3 py-3 flex items-center gap-2">
+                  <div className="bg-secondary rounded-xl px-3 py-3 flex items-center gap-2">
                     <span className="text-[#8F8781] text-xs">남성</span>
                     <input
                       type="number"
@@ -473,7 +519,7 @@ export default function AdminPage() {
                 <button
                   onClick={addEvent}
                   disabled={!newEvent.date}
-                  className="w-full py-3.5 rounded-xl text-sm font-bold text-[#1a1210] disabled:opacity-40"
+                  className="w-full py-3.5 rounded-xl text-sm font-bold text-secondary disabled:opacity-40"
                   style={{ backgroundColor: '#c6beb8' }}
                 >
                   추가
@@ -537,7 +583,7 @@ export default function AdminPage() {
                                       price: e.target.value === 'introvert' ? 45000 : 49000,
                                     }))
                                   }
-                                  className="bg-[#1a1210] rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
+                                  className="bg-secondary rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
                                 >
                                   <option value="introvert">내향인 파티</option>
                                   <option value="wine">와인 파티</option>
@@ -557,7 +603,7 @@ export default function AdminPage() {
                                       setEditSeats(p => ({ ...p, price: 49000 }))
                                     else setEditSeats(p => ({ ...p, price: 0 }))
                                   }}
-                                  className="bg-[#1a1210] rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
+                                  className="bg-secondary rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
                                 >
                                   <option value="45000">45,000원</option>
                                   <option value="49000">49,000원</option>
@@ -565,7 +611,7 @@ export default function AdminPage() {
                                 </select>
                               </div>
                               {editSeats.price !== 45000 && editSeats.price !== 49000 && (
-                                <div className="bg-[#1a1210] rounded-xl px-3 py-3 flex items-center gap-2">
+                                <div className="bg-secondary rounded-xl px-3 py-3 flex items-center gap-2">
                                   <span className="text-[#8F8781] text-xs shrink-0">직접입력</span>
                                   <input
                                     type="number"
@@ -582,10 +628,10 @@ export default function AdminPage() {
                                 type="time"
                                 value={editSeats.time}
                                 onChange={e => setEditSeats(p => ({ ...p, time: e.target.value }))}
-                                className="bg-[#1a1210] rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
+                                className="bg-secondary rounded-xl px-3 py-3 text-[#f5e2d4] text-sm outline-none"
                               />
                               <div className="grid grid-cols-2 gap-2">
-                                <div className="bg-[#1a1210] rounded-xl px-3 py-3 flex items-center gap-2">
+                                <div className="bg-secondary rounded-xl px-3 py-3 flex items-center gap-2">
                                   <span className="text-[#8F8781] text-xs">여성</span>
                                   <input
                                     type="number"
@@ -599,7 +645,7 @@ export default function AdminPage() {
                                     className="flex-1 bg-transparent text-[#f5e2d4] text-sm outline-none min-w-0"
                                   />
                                 </div>
-                                <div className="bg-[#1a1210] rounded-xl px-3 py-3 flex items-center gap-2">
+                                <div className="bg-secondary rounded-xl px-3 py-3 flex items-center gap-2">
                                   <span className="text-[#8F8781] text-xs">남성</span>
                                   <input
                                     type="number"
@@ -623,7 +669,7 @@ export default function AdminPage() {
                                 </button>
                                 <button
                                   onClick={() => saveEditEvent(ev.id)}
-                                  className="py-3 rounded-xl text-sm font-bold text-[#1a1210]"
+                                  className="py-3 rounded-xl text-sm font-bold text-secondary"
                                   style={{ backgroundColor: '#c6beb8' }}
                                 >
                                   저장
@@ -633,22 +679,22 @@ export default function AdminPage() {
                           ) : (
                             <>
                               <div className="grid grid-cols-3 gap-2">
-                                <div className="bg-[#1a1210] rounded-xl p-3 text-center">
+                                <div className="bg-secondary rounded-xl p-3 text-center">
                                   <p className="text-[#8F8781] text-xs mb-1">시작</p>
                                   <p className="text-[#f5e2d4] text-sm font-bold">{ev.time}</p>
                                 </div>
-                                <div className="bg-[#1a1210] rounded-xl p-3 text-center">
+                                <div className="bg-secondary rounded-xl p-3 text-center">
                                   <p className="text-[#8F8781] text-xs mb-1">여성</p>
                                   <p className="text-[#f5e2d4] text-xl font-bold">
                                     {display.female}
                                   </p>
                                 </div>
-                                <div className="bg-[#1a1210] rounded-xl p-3 text-center">
+                                <div className="bg-secondary rounded-xl p-3 text-center">
                                   <p className="text-[#8F8781] text-xs mb-1">남성</p>
                                   <p className="text-[#f5e2d4] text-xl font-bold">{display.male}</p>
                                 </div>
                               </div>
-                              <div className="bg-[#1a1210] rounded-xl px-3 py-2.5 flex items-center justify-between">
+                              <div className="bg-secondary rounded-xl px-3 py-2.5 flex items-center justify-between">
                                 <span className="text-[#8F8781] text-xs">참가비</span>
                                 <span className="text-[#f5e2d4] text-sm font-medium">
                                   {ev.price.toLocaleString()}원
@@ -719,12 +765,55 @@ export default function AdminPage() {
                         className={`w-14 h-7 rounded-full transition-colors duration-200 relative shrink-0 ${isVisible ? 'bg-[#c6beb8]' : 'bg-[#3a3230]'}`}
                       >
                         <span
-                          className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200 ${isVisible ? '' : 'translate-x-0.5'}`}
+                          className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200 ${isVisible ? 'translate-x-7' : 'translate-x-0.5'}`}
                         />
                       </button>
                     </div>
                   )
                 })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── 에러 로그 탭 ─────────────────────── */}
+        {tab === 'errors' && (
+          <div className="px-4 pt-4">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[#8F8781] text-xs">최근 에러 로그 (최대 100개)</p>
+              {errorLogs.length > 0 && (
+                <button
+                  onClick={clearErrorLogs}
+                  className="text-xs text-[#f87171] bg-[#2a2220] px-3 py-1.5 rounded-lg"
+                >
+                  전체 삭제
+                </button>
+              )}
+            </div>
+            {logsLoading ? (
+              <Spinner />
+            ) : errorLogs.length === 0 ? (
+              <p className="text-center text-[#8F8781] text-sm pt-20">에러 로그가 없습니다.</p>
+            ) : (
+              <div className="flex flex-col gap-2 pb-4">
+                {errorLogs.map(log => (
+                  <div key={log.id} className="bg-[#2a2220] rounded-2xl p-4">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#f87171]/20 text-[#f87171] font-medium shrink-0">
+                        {log.page}
+                      </span>
+                      <span className="text-[#8F8781] text-xs shrink-0">
+                        {new Date(log.created_at).toLocaleString('ko-KR')}
+                      </span>
+                    </div>
+                    <p className="text-[#f5e2d4] text-sm mb-1">{log.message}</p>
+                    {log.stack && (
+                      <p className="text-[#8F8781] text-xs leading-5 break-all whitespace-pre-wrap mt-2 border-t border-[#3a3230] pt-2">
+                        {log.stack}
+                      </p>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
           </div>

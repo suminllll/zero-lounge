@@ -42,6 +42,14 @@ export type PartySetting = {
   is_visible: boolean
 }
 
+export type ErrorLog = {
+  id: number
+  created_at: string
+  page: string
+  message: string
+  stack: string | null
+}
+
 /**
  * 당일 자동 잔여좌석 조정 로직
  * - 소셜링 당일: 여성 -2, 남성 -1

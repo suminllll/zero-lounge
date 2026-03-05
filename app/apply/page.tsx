@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { IoChevronBack } from 'react-icons/io5'
 import { supabase, getDisplaySeats, PARTY_LABELS } from '@/lib/supabase'
@@ -15,10 +16,24 @@ type FormData = {
   photo: File | null
   contact: string
   referral: string
+  referralOther: string
 }
 
 const TOTAL_STEPS = 10
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
+
+const BgImage = () => (
+  <div className="fixed inset-0 -z-10">
+    <Image
+      src="/images/bgImgae.jpeg"
+      alt="background"
+      fill
+      className="object-cover object-center"
+      quality={85}
+      sizes="390px"
+    />
+  </div>
+)
 
 export default function ApplyPage() {
   const [step, setStep] = useState(1)
@@ -33,13 +48,29 @@ export default function ApplyPage() {
     photo: null,
     contact: '',
     referral: '',
+    referralOther: '',
   })
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [copied, setCopied] = useState(false)
+  const [partyFilter] = useState<string | null>(() =>
+    typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('party') : null
+  )
 
   const handleCopyAccount = async () => {
-    await navigator.clipboard.writeText('1002-164-275949')
+    const text = '1002-164-275949'
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(text)
+    } else {
+      const el = document.createElement('textarea')
+      el.value = text
+      el.style.position = 'fixed'
+      el.style.opacity = '0'
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+    }
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -91,7 +122,7 @@ export default function ApplyPage() {
         birth_year: formData.birthYear,
         photo_url: photoUrl,
         contact: formData.contact,
-        referral: formData.referral,
+        referral: formData.referral === '기타' ? formData.referralOther : formData.referral,
         status: 'pending',
       })
 
@@ -142,6 +173,7 @@ export default function ApplyPage() {
     const event = eventsMap[dateStr]
     if (!event) return false
     if (partySettings[event.party_type] === false) return false
+    if (partyFilter && event.party_type !== partyFilter) return false
     const today = new Date().toISOString().split('T')[0]
     if (dateStr < today) return false
     const display = getDisplaySeats(event)
@@ -151,10 +183,11 @@ export default function ApplyPage() {
   // 로딩 화면
   if (isLoading) {
     return (
-      <main className="bg-secondary h-dvh flex flex-col items-center justify-center gap-6">
+      <main className="relative h-dvh flex flex-col items-center justify-center gap-6 text-secondary">
+        <BgImage />
         <div className="flex flex-col items-center gap-5">
-          <div className="w-10 h-10 border-2 border-primary/20 border-t-[#c6beb8] rounded-full animate-spin" />
-          <p className="text-[#c6beb8] text-sm">제출 중...</p>
+          <div className="w-10 h-10 border-2 border-secondary/20 border-t-secondary rounded-full animate-spin" />
+          <p className="text-sm">제출 중...</p>
         </div>
       </main>
     )
@@ -162,11 +195,12 @@ export default function ApplyPage() {
 
   if (isComplete) {
     return (
-      <div className="bg-secondary h-dvh flex flex-col items-center justify-center gap-6 px-8 text-center">
-        <h2 className="text-[#f5e2d4] text-xl font-bold">제로라운지 신청 완료</h2>
+      <div className="relative h-dvh flex flex-col items-center justify-center gap-6 px-8 text-center text-secondary">
+        <BgImage />
+        <h2 className="text-xl font-bold">제로라운지 신청 완료</h2>
 
         <p className="text-[#8F8781] text-sm leading-6">
-          인스타그램 <span className="text-[#c6beb8] font-semibold">@zero__lounge</span>를<br />
+          인스타그램 <span className="text-secondary font-semibold">@zero__lounge</span>를<br />
           팔로우 후 DM으로 입금자명과 참여 날짜를
           <br />
           보내주시면 최종 확정됩니다.
@@ -179,7 +213,7 @@ export default function ApplyPage() {
           href="https://www.instagram.com/zero__lounge/"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 w-full py-3 rounded-full font-bold text-secondary text-[17px]"
+          className="mt-2 w-full py-3 rounded-full font-bold text-secondary text-base"
           style={{ backgroundColor: '#c6beb8' }}
         >
           인스타그램으로 이동
@@ -192,26 +226,28 @@ export default function ApplyPage() {
   }
 
   return (
-    <div className="bg-secondary h-dvh  flex flex-col text-primary">
+    <div className="relative h-dvh flex flex-col text-secondary">
+      <BgImage />
+
       {/* 상단 진행바 */}
-      <div className="bg-secondary pt-16 pb-3 px-5 shrink-0">
+      <div className="pt-16 pb-3 px-5 shrink-0">
         <div className="flex items-center gap-3">
           {step > 1 ? (
-            <button onClick={back} className="text-[#c6beb8] shrink-0">
+            <button onClick={back} className="text-secondary shrink-0">
               <IoChevronBack size={24} />
             </button>
           ) : (
-            <Link href="/" className="text-[#c6beb8] shrink-0">
+            <Link href="/" className="text-secondary shrink-0">
               <IoChevronBack size={24} />
             </Link>
           )}
-          <div className="flex-1 h-1 bg-primary/20 rounded-full overflow-hidden">
+          <div className="flex-1 h-1 bg-secondary/20 rounded-full overflow-hidden">
             <div
               className="h-full bg-[#c6beb8] rounded-full transition-all duration-300"
               style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
             />
           </div>
-          <span className="text-[#8F8781] text-xs shrink-0">
+          <span className="text-secondary/50 text-xs shrink-0">
             {step}/{TOTAL_STEPS}
           </span>
         </div>
@@ -224,10 +260,10 @@ export default function ApplyPage() {
         {/* Step 1: 달력 */}
         {step === 1 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-8">날짜를 선택해주세요</h2>
+            <h2 className="text-xl font-bold mb-8">날짜를 선택해주세요</h2>
             {eventsLoading ? (
               <div className="flex justify-center py-16">
-                <div className="w-8 h-8 border-2 border-[#c6beb8]/20 border-t-[#c6beb8] rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-secondary/20 border-t-secondary rounded-full animate-spin" />
               </div>
             ) : (
               <>
@@ -235,18 +271,18 @@ export default function ApplyPage() {
                   <button
                     onClick={goPrevMonth}
                     disabled={isPrevDisabled}
-                    className="text-[#c6beb8] px-2 disabled:opacity-25"
+                    className="text-secondary px-2 disabled:opacity-25"
                   >
                     ‹
                   </button>
-                  <p className="text-[#c6beb8] text-sm font-bold">{monthLabel}</p>
-                  <button onClick={goNextMonth} className="text-[#c6beb8] px-2">
+                  <p className="text-secondary text-sm font-bold">{monthLabel}</p>
+                  <button onClick={goNextMonth} className="text-secondary px-2">
                     ›
                   </button>
                 </div>
                 <div className="grid grid-cols-7 mb-2">
                   {DAY_LABELS.map(d => (
-                    <div key={d} className="text-center text-[#8F8781] text-xs py-1">
+                    <div key={d} className="text-center text-secondary/40 text-xs py-1">
                       {d}
                     </div>
                   ))}
@@ -271,8 +307,8 @@ export default function ApplyPage() {
                           disabled={!selectable}
                           className={`aspect-square rounded-full text-sm flex items-center justify-center mx-auto w-9
                           ${isSelected ? 'text-secondary font-bold' : ''}
-                          ${selectable && !isSelected ? 'text-[#f5e2d4] font-medium' : ''}
-                          ${!selectable ? 'text-primary/25' : ''}
+                          ${selectable && !isSelected ? 'text-secondary font-medium' : ''}
+                          ${!selectable ? 'text-secondary/25' : ''}
                         `}
                           style={isSelected ? { backgroundColor: '#c6beb8' } : {}}
                         >
@@ -285,25 +321,25 @@ export default function ApplyPage() {
             )}
             {selectedEvent && displaySeats && (
               <div className="mt-6 flex flex-col gap-2">
-                <div className="bg-primary/10 rounded-2xl px-4 py-3 flex items-center justify-between">
-                  <p className="text-[#8F8781] text-xs">파티 종류</p>
-                  <p className="text-[#f5e2d4] text-sm font-medium">
+                <div className="bg-secondary/10 rounded-2xl px-4 py-3 flex items-center justify-between">
+                  <p className="text-secondary/50 text-xs">파티 종류</p>
+                  <p className="text-secondary text-sm font-medium">
                     {PARTY_LABELS[selectedEvent.party_type]}
                   </p>
                 </div>
-                <div className="bg-primary/10 rounded-2xl px-4 py-3 flex items-center justify-between">
-                  <p className="text-[#8F8781] text-xs">참가비</p>
-                  <p className="text-[#f5e2d4] text-sm font-medium">
+                <div className="bg-secondary/10 rounded-2xl px-4 py-3 flex items-center justify-between">
+                  <p className="text-secondary/50 text-xs">참가비</p>
+                  <p className="text-secondary text-sm font-medium">
                     {selectedEvent.price.toLocaleString()}원
                   </p>
                 </div>
-                <div className="bg-primary/10 rounded-2xl px-4 py-3 flex items-center justify-between">
-                  <p className="text-[#8F8781] text-xs">시작 시간</p>
-                  <p className="text-[#f5e2d4] text-sm font-medium">{selectedEvent.time}</p>
+                <div className="bg-secondary/10 rounded-2xl px-4 py-3 flex items-center justify-between">
+                  <p className="text-secondary/50 text-xs">시작 시간</p>
+                  <p className="text-secondary text-sm font-medium">{selectedEvent.time}</p>
                 </div>
-                <div className="bg-primary/10 rounded-2xl px-4 py-3 flex items-center justify-between">
-                  <p className="text-[#8F8781] text-xs">잔여 좌석</p>
-                  <p className="text-[#f5e2d4] text-sm font-medium">
+                <div className="bg-secondary/10 rounded-2xl px-4 py-3 flex items-center justify-between">
+                  <p className="text-secondary/50 text-xs">잔여 좌석</p>
+                  <p className="text-secondary text-sm font-medium">
                     여성 {displaySeats.female}자리 · 남성 {displaySeats.male}자리
                   </p>
                 </div>
@@ -312,7 +348,7 @@ export default function ApplyPage() {
             <button
               onClick={next}
               disabled={!formData.date}
-              className="mt-6 block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] disabled:opacity-40 transition-opacity"
+              className="mt-6 block w-full py-4 rounded-2xl text-center font-bold text-secondary text-base disabled:opacity-40 transition-opacity"
               style={{ backgroundColor: '#c6beb8' }}
             >
               {selectedEvent ? '신청하기' : '다음'}
@@ -323,14 +359,14 @@ export default function ApplyPage() {
         {/* Step 2: 성별 */}
         {step === 2 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-10">성별을 선택해주세요</h2>
+            <h2 className="text-xl font-bold mb-10">성별을 선택해주세요</h2>
             <div className="flex gap-4 mb-10">
               {['여성', '남성'].map(g => (
                 <button
                   key={g}
                   onClick={() => setFormData(f => ({ ...f, gender: g }))}
                   className={`flex-1 py-8 rounded-2xl text-lg font-bold transition-all
-                    ${formData.gender === g ? 'text-secondary' : 'text-[#c6beb8] bg-primary/10'}`}
+                    ${formData.gender === g ? 'text-secondary' : 'text-secondary/60 bg-secondary/10'}`}
                   style={formData.gender === g ? { backgroundColor: '#c6beb8' } : {}}
                 >
                   {g}
@@ -340,7 +376,7 @@ export default function ApplyPage() {
             <button
               onClick={next}
               disabled={!formData.gender}
-              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] disabled:opacity-40"
+              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-base disabled:opacity-40"
               style={{ backgroundColor: '#c6beb8' }}
             >
               다음
@@ -351,24 +387,24 @@ export default function ApplyPage() {
         {/* Step 3: 실명 */}
         {step === 3 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-2">
-              실명과 모임에서 사용할 닉네임을
+            <h2 className="text-xl font-bold mb-2">
+              실명 / 모임에서 사용할 닉네임을
               <br />
               알려주세요
             </h2>
-            <p className="text-[#8F8781] text-sm mb-8">ex)홍길동/동이</p>
+            <p className="text-secondary/50 text-sm mb-8">ex)홍길동/동이</p>
 
             <input
               type="text"
               value={formData.name}
               onChange={e => setFormData(f => ({ ...f, name: e.target.value }))}
               placeholder="홍길동/동이"
-              className="w-full bg-primary/10 rounded-2xl px-5 py-4 text-[#f5e2d4] text-base placeholder:text-primary/30 outline-none mb-10"
+              className="w-full bg-secondary/10 rounded-2xl px-5 py-4 text-secondary text-base placeholder:text-secondary/30 outline-none mb-10"
             />
             <button
               onClick={next}
-              disabled={formData.name.trim().length < 4}
-              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] disabled:opacity-40"
+              disabled={formData.name.trim().length < 1}
+              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-base disabled:opacity-40"
               style={{ backgroundColor: '#c6beb8' }}
             >
               다음
@@ -379,20 +415,20 @@ export default function ApplyPage() {
         {/* Step 4: 출생년도 */}
         {step === 4 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-2">출생년도와 MBTI를 알려주세요</h2>
-            <p className="text-[#8F8781] text-sm mb-1">ex. 1997, 마케터</p>
-            <p className="text-[#8F8781] text-xs mb-8">* 미성년자는 참가할 수 없습니다.</p>
+            <h2 className="text-xl font-bold mb-2">출생년도와 MBTI를 알려주세요</h2>
+            <p className="text-secondary/50 text-sm mb-1">ex. 97, ENFP</p>
+            <p className="text-secondary/40 text-xs mb-8">* 미성년자는 참가할 수 없습니다.</p>
             <input
               type="text"
               value={formData.birthYear}
               onChange={e => setFormData(f => ({ ...f, birthYear: e.target.value }))}
-              placeholder="1997, 마케터"
-              className="w-full bg-primary/10 rounded-2xl px-5 py-4 text-[#f5e2d4] text-base placeholder:text-primary/30 outline-none mb-10"
+              placeholder="97, ENFP"
+              className="w-full bg-secondary/10 rounded-2xl px-5 py-4 text-secondary text-base placeholder:text-secondary/30 outline-none mb-10"
             />
             <button
               onClick={next}
               disabled={!formData.birthYear.trim()}
-              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] disabled:opacity-40"
+              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-base disabled:opacity-40"
               style={{ backgroundColor: '#c6beb8' }}
             >
               다음
@@ -403,22 +439,24 @@ export default function ApplyPage() {
         {/* Step 5: 사진 */}
         {step === 5 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-2">
+            <h2 className="text-xl font-bold mb-2">
               본인 확인을 위해
               <br />
               최근 사진 한 장을 첨부해주세요
             </h2>
-            <p className="text-[#8F8781] text-xs mb-8">* 앞/옆모습 가능, 뒷모습은 불가능합니다.</p>
+            <p className="text-secondary/40 text-xs mb-8">
+              * 앞/옆모습 가능, 뒷모습은 불가능합니다.
+            </p>
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="w-full h-52 bg-primary/10 rounded-2xl flex flex-col items-center justify-center cursor-pointer mb-10 overflow-hidden"
+              className="w-full h-52 bg-secondary/10 rounded-2xl flex flex-col items-center justify-center cursor-pointer mb-10 overflow-hidden"
             >
               {photoPreview ? (
                 <img src={photoPreview} alt="미리보기" className="w-full h-full object-cover" />
               ) : (
                 <>
-                  <p className="text-[#c6beb8] text-4xl mb-2">+</p>
-                  <p className="text-[#c6beb8] text-sm">사진 선택</p>
+                  <p className="text-secondary/50 text-4xl mb-2">+</p>
+                  <p className="text-secondary/50 text-sm">사진 선택</p>
                 </>
               )}
             </div>
@@ -438,7 +476,7 @@ export default function ApplyPage() {
             <button
               onClick={next}
               disabled={!formData.photo}
-              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] disabled:opacity-40"
+              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-base disabled:opacity-40"
               style={{ backgroundColor: '#c6beb8' }}
             >
               다음
@@ -449,23 +487,23 @@ export default function ApplyPage() {
         {/* Step 6: 연락처 */}
         {step === 6 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-2">
+            <h2 className="text-xl font-bold mb-2">
               모임 참여에 대한 안내를 받아보실
               <br />
               연락처를 알려주세요
             </h2>
-            <p className="text-[#8F8781] text-sm mb-8">카카오톡 또는 문자로 안내드려요.</p>
+            <p className="text-secondary/50 text-sm mb-8">카카오톡 또는 문자로 안내드려요.</p>
             <input
               type="tel"
               value={formData.contact}
               onChange={e => setFormData(f => ({ ...f, contact: e.target.value }))}
               placeholder="010-0000-0000"
-              className="w-full bg-primary/10 rounded-2xl px-5 py-4 text-[#f5e2d4] text-base placeholder:text-primary/30 outline-none mb-10"
+              className="w-full bg-secondary/10 rounded-2xl px-5 py-4 text-secondary text-base placeholder:text-secondary/30 outline-none mb-10"
             />
             <button
               onClick={next}
               disabled={formData.contact.replace(/-/g, '').replace(/ /g, '').length < 10}
-              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] disabled:opacity-40"
+              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-base disabled:opacity-40"
               style={{ backgroundColor: '#c6beb8' }}
             >
               다음
@@ -476,7 +514,7 @@ export default function ApplyPage() {
         {/* Step 7: 유입 경로 */}
         {step === 7 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-8">
+            <h2 className="text-xl font-bold mb-8">
               제로라운지를
               <br />
               어디서 보고 오셨나요?
@@ -485,19 +523,29 @@ export default function ApplyPage() {
               {['인스타그램 릴스', '인스타그램 광고', '스레드', '기타'].map(option => (
                 <button
                   key={option}
-                  onClick={() => setFormData(f => ({ ...f, referral: option }))}
+                  onClick={() => setFormData(f => ({ ...f, referral: option, referralOther: '' }))}
                   className={`w-full py-4 rounded-2xl text-base font-medium transition-all
-                    ${formData.referral === option ? 'text-secondary font-bold' : 'text-[#c6beb8] bg-primary/10'}`}
+                    ${formData.referral === option ? 'text-secondary font-bold' : 'text-secondary/60 bg-secondary/10'}`}
                   style={formData.referral === option ? { backgroundColor: '#c6beb8' } : {}}
                 >
                   {option}
                 </button>
               ))}
+              {formData.referral === '기타' && (
+                <input
+                  type="text"
+                  value={formData.referralOther}
+                  onChange={e => setFormData(f => ({ ...f, referralOther: e.target.value }))}
+                  placeholder="어디서 보셨나요?"
+                  autoFocus
+                  className="w-full bg-secondary/10 rounded-2xl px-5 py-4 text-secondary text-base placeholder:text-secondary/30 outline-none"
+                />
+              )}
             </div>
             <button
               onClick={next}
-              disabled={!formData.referral}
-              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] disabled:opacity-40"
+              disabled={!formData.referral || (formData.referral === '기타' && !formData.referralOther.trim())}
+              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-base disabled:opacity-40"
               style={{ backgroundColor: '#c6beb8' }}
             >
               다음
@@ -508,9 +556,9 @@ export default function ApplyPage() {
         {/* Step 8: 환불 안내 */}
         {step === 8 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-6">환불 안내</h2>
-            <div className="bg-primary/10 rounded-2xl p-6 text-[#c6beb8] text-[14px] leading-7 mb-8">
-              <p className="font-bold text-[#f5e2d4] mb-3">제로라운지에서는</p>
+            <h2 className="text-xl font-bold mb-6">환불 안내</h2>
+            <div className="bg-secondary/10 rounded-2xl p-6 text-secondary/70 text-sm leading-7 mb-8">
+              <p className="font-bold text-secondary mb-3">제로라운지에서는</p>
               <p className="mb-4">
                 신청서를 신중히 검토한 후,
                 <br />
@@ -523,18 +571,18 @@ export default function ApplyPage() {
                 <br />
                 선정에서 제외될 수 있습니다.
                 <br />
-                <span className="text-xs text-[#8F8781]">(해당 경우에는 전액 환불 됩니다.)</span>
+                <span className="text-xs text-secondary/40">(해당 경우에는 전액 환불 됩니다.)</span>
               </p>
-              <div className="border-t border-primary/20 pt-4 flex flex-col gap-1">
+              <div className="border-t border-secondary/20 pt-4 flex flex-col gap-1">
                 <p>4일 전 전액환불</p>
                 <p>3일 전 70% 환불</p>
                 <p>2일 전 50% 환불</p>
-                <p className="font-semibold text-[#f5e2d4]">당일 및 전날 환불 불가</p>
+                <p className="font-semibold text-secondary">당일 및 전날 환불 불가</p>
               </div>
             </div>
             <button
               onClick={next}
-              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px]"
+              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-base"
               style={{ backgroundColor: '#c6beb8' }}
             >
               환불 정책에 동의합니다
@@ -545,24 +593,24 @@ export default function ApplyPage() {
         {/* Step 9: 참가비 */}
         {step === 9 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-6">참가비 안내</h2>
-            <div className="bg-primary/10 rounded-2xl p-6 text-[#c6beb8] text-[14px] leading-7 mb-8">
+            <h2 className="text-xl font-bold mb-6">참가비 안내</h2>
+            <div className="bg-secondary/10 rounded-2xl p-6 text-secondary/70 text-sm leading-7 mb-8">
               <div className="text-center mb-6">
-                <p className="text-[#8F8781] text-xs mb-2">참가비</p>
-                <p className="text-[#f5e2d4] text-4xl font-bold">
+                <p className="text-secondary/50 text-xs mb-2">참가비</p>
+                <p className="text-secondary text-4xl font-bold">
                   {selectedEvent ? selectedEvent.price.toLocaleString() : '45,000'}원
                 </p>
                 {selectedEvent && (
-                  <p className="text-[#8F8781] text-xs mt-1">
+                  <p className="text-secondary/50 text-xs mt-1">
                     {PARTY_LABELS[selectedEvent.party_type]}
                   </p>
                 )}
               </div>
-              <div className="border-t border-primary/20 pt-5">
-                <p className="text-[#8F8781] text-xs mb-1">입금 계좌</p>
-                <p className="text-[#f5e2d4] font-semibold text-base">우리은행</p>
+              <div className="border-t border-secondary/20 pt-5">
+                <p className="text-secondary/50 text-xs mb-1">입금 계좌</p>
+                <p className="text-secondary font-semibold text-base">우리은행</p>
                 <div className="flex items-center justify-between gap-2 mt-0.5">
-                  <p className="text-[#f5e2d4] font-semibold text-base">1002-164-275949</p>
+                  <p className="text-secondary font-semibold text-base">1002-164-275949</p>
                   <button
                     onClick={handleCopyAccount}
                     className="shrink-0 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors"
@@ -572,22 +620,22 @@ export default function ApplyPage() {
                   </button>
                 </div>
               </div>
-              <div className="border-t border-primary/20 mt-5 pt-4 text-xs leading-6">
-                <p className="text-[#8F8781]">
+              <div className="border-t border-secondary/20 mt-5 pt-4 text-xs leading-6">
+                <p className="text-secondary/50">
                   * 입금이 지연될 경우, 신청서를 다시 작성하셔야 합니다.
                 </p>
               </div>
             </div>
             <button
               onClick={() => window.open('https://qr.kakaopay.com/Ej9ND22l6', '_blank')}
-              className="block w-full py-4 mb-3 rounded-2xl text-center font-bold text-secondary text-[17px]"
+              className="block w-full py-4 mb-3 rounded-2xl text-center font-bold text-secondary text-base"
               style={{ backgroundColor: '#c6beb8' }}
             >
               카카오페이로 송금하고 오기
             </button>
             <button
               onClick={next}
-              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px]"
+              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-base"
               style={{ backgroundColor: '#c6beb8' }}
             >
               네, 확인했습니다!
@@ -598,10 +646,10 @@ export default function ApplyPage() {
         {/* Step 10: 필독 + 제출 */}
         {step === 10 && (
           <div>
-            <h2 className="text-[#f5e2d4] text-xl font-bold mb-6">▪️ 필독사항 ▪️</h2>
-            <div className="bg-primary/10 rounded-2xl p-6 text-[#c6beb8] text-[14px] leading-7 mb-8">
+            <h2 className="text-xl font-bold mb-6">▪️ 필독사항 ▪️</h2>
+            <div className="bg-secondary/10 rounded-2xl p-6 text-secondary/70 text-sm leading-7 mb-8">
               <p className="mb-4">
-                인스타 계정(<span className="text-[#f5e2d4] font-semibold">@zero__lounge</span>)를
+                인스타 계정(<span className="text-secondary font-semibold">@zero__lounge</span>)를
                 <br />
                 팔로우한 뒤,
                 <br />
@@ -609,18 +657,18 @@ export default function ApplyPage() {
                 <br />
                 확정 안내 메세지를 보내드립니다.
               </p>
-              <div className="bg-secondary/60 rounded-xl p-4 mb-4">
-                <p className="text-[#f5e2d4] font-semibold">입금자명, 참여 날짜</p>
-                <p className="text-[#8F8781] text-xs mt-1">(ex. 홍길동 10/3 금요일)</p>
+              <div className="bg-secondary/10 rounded-xl p-4 mb-4">
+                <p className="text-secondary font-semibold">입금자명, 참여 날짜</p>
+                <p className="text-secondary/50 text-xs mt-1">(ex. 홍길동 10/3 금요일)</p>
               </div>
-              <p className="text-xs text-[#8F8781] leading-5">
+              <p className="text-xs text-secondary/50 leading-5">
                 * 팔로우를 하지 않고 DM을 보낼경우 스팸처리함으로 들어가니 꼭 팔로우 후에 DM을
                 보내주세요. <br />* DM이 확인되지 않을 경우, 모임 입장이 제한될 수 있습니다.
               </p>
             </div>
             <button
               onClick={handleSubmit}
-              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px]"
+              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-base"
               style={{ backgroundColor: '#c6beb8' }}
             >
               신청서 작성 완료

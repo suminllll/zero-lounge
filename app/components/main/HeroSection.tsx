@@ -3,7 +3,7 @@ import Image from 'next/image'
 const HeroSection = () => {
   return (
     <section className="relative">
-      <div className="relative h-[50vh]">
+      <div className="relative h-[50vh] bg-[#2a2220]">
         <Image
           src={'/images/heroSlide1.jpg'}
           alt={'hero side1'}

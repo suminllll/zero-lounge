@@ -11,6 +11,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
 
   const isPartyPage = pathname?.startsWith('/party/')
+  const isApplyPage = pathname?.startsWith('/apply')
 
   useEffect(() => {
     setScrolled(false)
@@ -29,14 +30,21 @@ export default function Header() {
     >
       <div className="flex items-center justify-between h-full px-3">
         {isPartyPage ? (
-          <button onClick={() => router.back()} className="w-9 h-9 flex items-center justify-center">
+          <button
+            onClick={() => router.back()}
+            className="w-9 h-9 flex items-center justify-center"
+          >
             <IoChevronBack size={26} />
           </button>
         ) : (
           <div className="w-9" />
         )}
         <Link href="/">
-          <h2 className="text-sm font-bold tracking-widest">ZERO LOUNGE</h2>
+          <h2
+            className={`text-sm font-bold tracking-widest ${isApplyPage ? 'text-[#311d0a]' : ''}`}
+          >
+            ZERO LOUNGE
+          </h2>
         </Link>
         <div className="w-9" />
       </div>

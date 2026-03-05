@@ -7,12 +7,13 @@ import Lightbox from 'yet-another-react-lightbox'
 import 'yet-another-react-lightbox/styles.css'
 
 const images = [
-  '/images/heroSlide4.jpg',
-  '/images/heroSlide2.jpg',
-  '/images/heroSlide6.jpg',
+  '/images/heroSlide8.png',
+  '/images/heroSlide7.png',
+  '/images/heroSlide6.png',
   '/images/slide1.jpeg',
   '/images/slide4.jpeg',
   '/images/slide2.jpeg',
+  '/images/heroSlide4.jpg',
 ]
 
 const slides = images.map(src => ({ src }))
@@ -30,7 +31,7 @@ export default function GallerySlider() {
 
   return (
     <div className="mt-12">
-      <p className="pl-[4vw] text-[#f5e2d4] text-[18px] font-bold mb-4">소셜링 갤러리</p>
+      <p className="pl-[4vw] text-lg font-bold mb-4">소셜링 갤러리</p>
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex gap-3 px-4">
           {images.map((src, i) => (

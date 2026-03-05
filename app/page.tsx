@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import AboutSection from './components/main/AboutSection'
 import HeroSection from './components/main/HeroSection'
 import ScheduleButton from './components/main/ScheduleButton'
@@ -12,7 +13,18 @@ export default async function Home() {
   const showWine = settings['wine'] !== false
 
   return (
-    <div>
+    <div className="relative text-secondary">
+      <div className="fixed inset-0 -z-10">
+        <Image
+          src="/images/bgImgae.jpeg"
+          alt="background"
+          fill
+          className="object-cover object-center"
+          quality={85}
+          sizes="390px"
+          priority
+        />
+      </div>
       <HeroSection />
       <AboutSection showWine={showWine} />
       <ScheduleButton showWine={showWine} />

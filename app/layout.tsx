@@ -53,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning={true}>
       <body
         className={`${suit.className} antialiased m-0 p-0 min-h-screen relative`}
         suppressHydrationWarning={true}

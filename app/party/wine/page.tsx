@@ -1,8 +1,24 @@
 import Image from 'next/image'
+import PartyApplyButton from '@/app/components/party/PartyApplyButton'
+
+const BG = (
+  <div className="fixed inset-0 -z-10">
+    <Image
+      src="/images/bgImgae.jpeg"
+      alt="background"
+      fill
+      className="object-cover object-center"
+      quality={85}
+      sizes="390px"
+    />
+  </div>
+)
 
 export default function WinePartyPage() {
   return (
-    <main className="bg-secondary min-h-screen text-primary">
+    <main className="min-h-screen relative text-secondary">
+      {BG}
+
       {/* 헤더 이미지 */}
       <div className="relative w-full h-[45vh] bg-[#2a2220]">
         <Image
@@ -23,7 +39,7 @@ export default function WinePartyPage() {
 
       {/* 내용 */}
       <div className="px-5 py-10 flex flex-col gap-8">
-        <div className="pt-8 flex flex-col gap-6 text-[#c6beb8] text-[15px] leading-7 font-light">
+        <div className="pt-8 flex flex-col gap-6 text-sm leading-7 ">
           <p>
             와인과 함께 하는 대화형 소셜링이에요.
             <br />
@@ -36,10 +52,10 @@ export default function WinePartyPage() {
           </p>
         </div>
 
-        <div className="bg-secondary rounded-3xl py-8 flex flex-col gap-6 text-primary text-center">
+        <div className="border-secondary rounded-3xl py-8 flex flex-col gap-8 text-secondary text-center">
           <div>
-            <p className="font-bold text-base">제공 메뉴</p>
-            <p className="text-sm mt-1 font-light leading-6">
+            <p className="font-bold ">제공 메뉴</p>
+            <p className="text-sm mt-1  leading-6">
               과일 플래터
               <br />
               치즈 플래터
@@ -51,26 +67,18 @@ export default function WinePartyPage() {
           </div>
           <div>
             <p className="font-bold text-base">제공 주류</p>
-            <p className="text-sm mt-1 font-light">레드와인 / 화이트 와인 / 논알콜 무제한 제공</p>
+            <p className="text-sm mt-1 ">레드와인 / 화이트 와인 / 논알콜 무제한 제공</p>
           </div>
 
           <div>
             <p className="font-bold text-base">참가비</p>
-            <p className="text-sm mt-1 font-light leading-6">49,000원</p>
+            <p className="text-sm mt-1  leading-6">49,000원</p>
           </div>
         </div>
       </div>
 
       {/* 참가신청 버튼 */}
-      <div className="px-5 pb-10">
-        <a
-          href="/apply?party=wine"
-          className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-[17px] tracking-wide"
-          style={{ backgroundColor: '#c6beb8' }}
-        >
-          소셜링 신청하기
-        </a>
-      </div>
+      <PartyApplyButton href="/apply?party=wine" />
     </main>
   )
 }

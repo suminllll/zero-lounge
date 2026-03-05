@@ -122,9 +122,13 @@ const DetailModal = ({ app, onClose, onUpdateStatus }: DetailModalProps) => (
 )
 
 export default function AdminPage() {
-  const [isAuthed, setIsAuthed] = useState(false)
+  const [isAuthed, setIsAuthed] = useState(() => {
+    if (typeof document === 'undefined') return false
+    return document.cookie.split(';').some(c => c.trim() === 'admin_auth=1')
+  })
   const [password, setPassword] = useState('')
   const [passwordError, setPasswordError] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
   const [tab, setTab] = useState<AdminTab>('applications')
   const [copiedId, setCopiedId] = useState<number | null>(null)
 
@@ -174,6 +178,9 @@ export default function AdminPage() {
     if (password === adminPw) {
       setIsAuthed(true)
       setPasswordError(false)
+      if (rememberMe) {
+        document.cookie = `admin_auth=1; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Strict`
+      }
     } else setPasswordError(true)
   }
 
@@ -183,8 +190,7 @@ export default function AdminPage() {
     const nickname = app.name.includes('/')
       ? app.name.split('/').slice(1).join('/').trim()
       : app.name.trim()
-    const year = app.birth_year.split(/[,/]/)[0].trim()
-    await navigator.clipboard.writeText(`${gender}/${nickname}/${year}`)
+    await navigator.clipboard.writeText(`${gender}/${nickname}/${app.birth_year} (인스타)`)
     setCopiedId(app.id)
     setTimeout(() => setCopiedId(null), 2000)
   }
@@ -256,6 +262,15 @@ export default function AdminPage() {
           {passwordError && (
             <p className="text-red-400 text-sm mb-3 text-center">비밀번호가 틀렸습니다.</p>
           )}
+          <label className="flex items-center gap-2 mb-4 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={e => setRememberMe(e.target.checked)}
+              className="w-4 h-4 accent-[#c6beb8]"
+            />
+            <span className="text-[#8F8781] text-sm">로그인 상태 유지</span>
+          </label>
           <button
             onClick={handleLogin}
             className="w-full py-4 rounded-2xl font-bold text-secondary text-base"

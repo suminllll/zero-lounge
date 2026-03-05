@@ -11,8 +11,6 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
 
   const isPartyPage = pathname?.startsWith('/party/')
-  const isApplyPage = pathname?.startsWith('/apply')
-
   useEffect(() => {
     setScrolled(false)
     if (!isPartyPage) return
@@ -41,7 +39,7 @@ export default function Header() {
         )}
         <Link href="/">
           <h2
-            className={`text-sm font-bold tracking-widest ${isApplyPage ? 'text-[#311d0a]' : ''}`}
+            className="text-sm font-bold tracking-widest"
           >
             ZERO LOUNGE
           </h2>

@@ -12,7 +12,7 @@ export default async function Home() {
   const showWine = settings['wine'] !== false
 
   return (
-    <div className="relative text-secondary">
+    <div className="relative text-primary">
       <HeroSection />
       <AboutSection showWine={showWine} />
       <ScheduleButton showWine={showWine} />

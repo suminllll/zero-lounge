@@ -5,7 +5,7 @@ interface NoticeSectionProps {
 export default function NoticeSection({ showWine }: NoticeSectionProps) {
   return (
     <div className=" w-[90%] mx-auto rounded-3xl px-6">
-      <p className="text-center text-3xl font-bold italic text-secondary mb-8 tracking-widest">
+      <p className="text-center text-3xl font-bold italic text-primary mb-8 tracking-widest">
         NOTICE
       </p>
       <div className="border bg-secondary border-primary/30 rounded-[80px] px-8 py-10 flex flex-col gap-8 text-center text-primary">

@@ -47,9 +47,10 @@ interface DetailModalProps {
   app: Application
   onClose: () => void
   onUpdateStatus: (id: number, status: Application['status']) => void
+  onDelete: (id: number) => void
 }
 
-const DetailModal = ({ app, onClose, onUpdateStatus }: DetailModalProps) => (
+const DetailModal = ({ app, onClose, onUpdateStatus, onDelete }: DetailModalProps) => (
   <div className="fixed inset-0 bg-black/70 z-50 flex items-end" onClick={onClose}>
     <div
       className="bg-secondary w-full rounded-t-3xl p-5 pb-10 max-h-[90vh] overflow-y-auto"
@@ -106,16 +107,26 @@ const DetailModal = ({ app, onClose, onUpdateStatus }: DetailModalProps) => (
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        {(['confirmed', 'rejected', 'pending'] as const).map(s => (
-          <button
-            key={s}
-            onClick={() => onUpdateStatus(app.id, s)}
-            className={`py-4 rounded-2xl text-sm font-bold ${s === 'rejected' ? 'text-white' : 'text-secondary'} ${app.status === s ? 'ring-2 ring-white/30' : ''}`}
-            style={{ backgroundColor: STATUS_COLOR[s] }}
-          >
-            {STATUS_LABEL[s]}
-          </button>
-        ))}
+        <button
+          onClick={() => onUpdateStatus(app.id, 'confirmed')}
+          className={`py-4 rounded-2xl text-sm font-bold text-secondary ${app.status === 'confirmed' ? 'ring-2 ring-white/30' : ''}`}
+          style={{ backgroundColor: STATUS_COLOR['confirmed'] }}
+        >
+          확정
+        </button>
+        <button
+          onClick={() => onDelete(app.id)}
+          className="py-4 rounded-2xl text-sm font-bold text-[#f87171] bg-[#f87171]/20"
+        >
+          삭제
+        </button>
+        <button
+          onClick={() => onUpdateStatus(app.id, 'pending')}
+          className={`py-4 rounded-2xl text-sm font-bold text-secondary ${app.status === 'pending' ? 'ring-2 ring-white/30' : ''}`}
+          style={{ backgroundColor: STATUS_COLOR['pending'] }}
+        >
+          대기
+        </button>
       </div>
     </div>
   </div>
@@ -198,6 +209,13 @@ export default function AdminPage() {
   const updateStatus = async (id: number, status: Application['status']) => {
     await supabase.from('applications').update({ status }).eq('id', id)
     if (selectedApp?.id === id) setSelectedApp(prev => (prev ? { ...prev, status } : null))
+    queryClient.invalidateQueries({ queryKey: ['applications'] })
+  }
+
+  const deleteApplication = async (id: number) => {
+    if (!confirm('신청자를 삭제할까요? 이 작업은 되돌릴 수 없습니다.')) return
+    await supabase.from('applications').delete().eq('id', id)
+    setSelectedApp(null)
     queryClient.invalidateQueries({ queryKey: ['applications'] })
   }
 
@@ -291,6 +309,7 @@ export default function AdminPage() {
             app={selectedApp}
             onClose={() => setSelectedApp(null)}
             onUpdateStatus={updateStatus}
+            onDelete={deleteApplication}
           />
         )}
 

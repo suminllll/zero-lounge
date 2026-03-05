@@ -29,12 +29,6 @@ export default function Footer() {
               >
                 Terms of Service
               </button>
-              <button
-                onClick={() => setOpenModal('contact')}
-                className="text-xs hover:text-primary transition-colors cursor-pointer"
-              >
-                Contact
-              </button>
             </div>
           </div>
         </div>

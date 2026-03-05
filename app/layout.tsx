@@ -11,16 +11,28 @@ const suit = localFont({
   variable: '--font-suit',
 })
 
-const SITE_URL = 'https://zero-lounge.vercel.app' // 배포 후 실제 도메인으로 교체
+const SITE_URL = 'https://zerolounge.kr' // 배포 후 실제 도메인으로 교체
 
 export const metadata: Metadata = {
   title: 'ZERO LOUNGE | 혼자 오는 사람들을 위한 소셜링',
-  description:
-    '낯선 사람이 편한 사람이 되는 자리. 내향인을 위한 소셜 파티, ZERO LOUNGE. 공덕·애오개 사이에서 매주 열리는 대화 중심 소셜링.',
-  keywords: ['소셜링', '내향인 파티', '와인 파티', '혼자 술자리', '공덕 소셜링', '제로라운지', 'ZERO LOUNGE', '2030 모임'],
+  description: '낯선 사람이 편한 사람이 되는 자리. 내향인을 위한 소셜 파티, ZERO LOUNGE.',
+  keywords: [
+    '소셜링',
+    '내향인파티',
+    '와인파티',
+    '혼술바',
+    '제로라운지',
+    'ZERO LOUNGE',
+    '2030 모임',
+    '솔로파티',
+    '서울 혼술바',
+    '공덕 혼술바',
+    '서울파티',
+    '서울모임',
+  ],
   metadataBase: new URL(SITE_URL),
   openGraph: {
-    title: 'ZERO LOUNGE | 혼자 와도 괜찮아요',
+    title: 'ZERO LOUNGE | 대화형 소셜링',
     description: '낯선 사람이 편한 사람이 되는 자리. 내향인을 위한 소셜 파티.',
     url: SITE_URL,
     siteName: 'ZERO LOUNGE',

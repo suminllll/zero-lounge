@@ -9,7 +9,7 @@ const WHO_LIST = [
 
 export default function WhoSection() {
   return (
-    <div className="flex flex-col items-center my-20 text-lg font-light ">
+    <div className="flex flex-col items-center my-15 text-lg font-light ">
       <p className="text-xl font-bold mb-2 text-center">이런 분이 오시면 좋아요!</p>
       <div className="text-base leading-7 font-medium flex flex-col gap-1 mt-3">
         {WHO_LIST.map((item, i) => (

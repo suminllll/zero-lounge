@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://zero-lounge.vercel.app/sitemap.xml',
+    sitemap: 'https://zerolounge.kr',
   }
 }

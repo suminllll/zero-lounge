@@ -3,7 +3,7 @@ import Image from 'next/image'
 export default function IntroSection() {
   return (
     <>
-      <h1 className="font-medium text-lg leading-7 break-all whitespace-pre-wrap px-[15px] mb-30">
+      <h1 className="font-medium text-lg leading-7 break-all whitespace-pre-wrap px-[15px] pb-10">
         낯선 사람이 편한 사람이 되는 자리.
         <br />
         <br />
@@ -32,7 +32,7 @@ export default function IntroSection() {
           </p>
         </div>
 
-        <p className="mt-20 pl-[4vw] text-lg leading-7  font-medium">
+        <p className="mt-20 pl-[4vw] text-base leading-7  font-medium">
           요즘은 사람을
           <br /> 어디에서 만나야 할지 잘 모르겠어요.
           <br />

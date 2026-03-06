@@ -11,6 +11,7 @@ type FormData = {
   date: string
   gender: string
   name: string
+  nickname: string
   birthYear: string
   photo: File | null
   contact: string
@@ -18,7 +19,7 @@ type FormData = {
   referralOther: string
 }
 
-const TOTAL_STEPS = 9
+const TOTAL_STEPS = 10
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
 
@@ -31,6 +32,7 @@ export default function ApplyPage() {
     date: '',
     gender: '',
     name: '',
+    nickname: '',
     birthYear: '',
     photo: null,
     contact: '',
@@ -106,6 +108,7 @@ export default function ApplyPage() {
         date: formData.date,
         gender: formData.gender,
         name: formData.name,
+        nickname: formData.nickname,
         birth_year: formData.birthYear,
         photo_url: photoUrl,
         contact: formData.contact,
@@ -161,10 +164,9 @@ export default function ApplyPage() {
     if (!event) return false
     if (partySettings[event.party_type] === false) return false
     if (partyFilter && event.party_type !== partyFilter) return false
-    const today = new Date().toISOString().split('T')[0]
-    if (dateStr < today) return false
-    const display = getDisplaySeats(event)
-    return display.female > 0 || display.male > 0
+    const kstToday = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0]
+    if (dateStr < kstToday) return false
+    return event.female_seats > 0 || event.male_seats > 0
   }
 
   // 로딩 화면
@@ -367,21 +369,16 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 3: 실명 */}
+        {/* Step 3: 성함 */}
         {step === 3 && (
           <div>
-            <h2 className="text-xl font-bold mb-2">
-              실명 / 모임에서 사용할 닉네임을
-              <br />
-              알려주세요
-            </h2>
-            <p className="text-primary/50 text-sm mb-8">ex)홍길동/동이</p>
-
+            <h2 className="text-xl font-bold mb-2">성함을 알려주세요</h2>
+            <p className="text-primary/50 text-sm mb-8">ex) 홍길동</p>
             <input
               type="text"
               value={formData.name}
               onChange={e => setFormData(f => ({ ...f, name: e.target.value }))}
-              placeholder="홍길동/동이"
+              placeholder="홍길동"
               className="w-full bg-primary/10 rounded-2xl px-5 py-4 text-primary text-base placeholder:text-primary/30 outline-none mb-10"
             />
             <button
@@ -395,8 +392,35 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 4: 출생년도 */}
+        {/* Step 4: 닉네임 */}
         {step === 4 && (
+          <div>
+            <h2 className="text-xl font-bold mb-2">
+              모임에서 사용할
+              <br />
+              닉네임을 알려주세요
+            </h2>
+            <p className="text-primary/50 text-sm mb-8">ex) 동이</p>
+            <input
+              type="text"
+              value={formData.nickname}
+              onChange={e => setFormData(f => ({ ...f, nickname: e.target.value }))}
+              placeholder="동이"
+              className="w-full bg-primary/10 rounded-2xl px-5 py-4 text-primary text-base placeholder:text-primary/30 outline-none mb-10"
+            />
+            <button
+              onClick={next}
+              disabled={formData.nickname.trim().length < 1}
+              className="block w-full py-4 rounded-2xl text-center font-bold text-secondary text-base disabled:opacity-40"
+              style={{ backgroundColor: '#c6beb8' }}
+            >
+              다음
+            </button>
+          </div>
+        )}
+
+        {/* Step 5: 출생년도 */}
+        {step === 5 && (
           <div>
             <h2 className="text-xl font-bold mb-2">출생년도와 MBTI를 알려주세요</h2>
             <p className="text-primary/50 text-sm mb-1">ex. 97, ENFP</p>
@@ -419,8 +443,8 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 5: 사진 */}
-        {step === 5 && (
+        {/* Step 6: 사진 */}
+        {step === 6 && (
           <div>
             <h2 className="text-xl font-bold mb-2">
               본인 확인을 위해
@@ -467,8 +491,8 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 6: 연락처 */}
-        {step === 6 && (
+        {/* Step 7: 연락처 */}
+        {step === 7 && (
           <div>
             <h2 className="text-xl font-bold mb-2">
               모임 참여에 대한 안내를 받아보실
@@ -494,8 +518,8 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 7: 유입 경로 */}
-        {step === 7 && (
+        {/* Step 8: 유입 경로 */}
+        {step === 8 && (
           <div>
             <h2 className="text-xl font-bold mb-8">
               제로라운지를
@@ -536,8 +560,8 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 8: 환불 안내 */}
-        {step === 8 && (
+        {/* Step 9: 환불 안내 */}
+        {step === 9 && (
           <div>
             <h2 className="text-xl font-bold mb-6">환불 안내</h2>
             <div className="bg-primary/10 rounded-2xl p-6 text-primary/70 text-sm leading-7 mb-8">
@@ -573,8 +597,8 @@ export default function ApplyPage() {
           </div>
         )}
 
-        {/* Step 9: 참가비 + 필독 + 제출 */}
-        {step === 9 && (
+        {/* Step 10: 참가비 + 필독 + 제출 */}
+        {step === 10 && (
           <div>
             <h2 className="text-xl font-bold mb-6">참가비 안내</h2>
             <div className="bg-primary/10 rounded-2xl p-6 text-primary/70 text-sm leading-7 mb-5">

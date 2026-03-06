@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   supabase,
@@ -20,14 +20,12 @@ type AdminTab = 'applications' | 'events' | 'parties' | 'errors'
 
 const STATUS_LABEL: Record<Application['status'], string> = {
   pending: '대기',
-  confirmed: '입금완료',
-  rejected: '미입금',
+  confirmed: '확정',
 }
 
 const STATUS_COLOR: Record<Application['status'], string> = {
   pending: '#c6beb8',
   confirmed: '#4ade80',
-  rejected: '#f87171',
 }
 
 const TAB_ITEMS: { key: AdminTab; label: string }[] = [
@@ -94,6 +92,7 @@ const DetailModal = ({ app, onClose, onUpdateStatus, onDelete }: DetailModalProp
         {[
           ['신청 날짜', app.date],
           ['성별', app.gender],
+          ['닉네임', app.nickname],
           ['출생년도/직업', app.birth_year],
           ['연락처', app.contact],
           ['유입 경로', app.referral],
@@ -132,11 +131,16 @@ const DetailModal = ({ app, onClose, onUpdateStatus, onDelete }: DetailModalProp
   </div>
 )
 
+const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
+function getDayLabel(dateStr: string) {
+  return DAY_LABELS[new Date(dateStr + 'T00:00:00').getDay()]
+}
+
 export default function AdminPage() {
-  const [isAuthed, setIsAuthed] = useState(() => {
-    if (typeof document === 'undefined') return false
-    return document.cookie.split(';').some(c => c.trim() === 'admin_auth=1')
-  })
+  const [isAuthed, setIsAuthed] = useState(false)
+  useEffect(() => {
+    setIsAuthed(document.cookie.split(';').some(c => c.trim() === 'admin_auth=1'))
+  }, [])
   const [password, setPassword] = useState('')
   const [passwordError, setPasswordError] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
@@ -144,11 +148,36 @@ export default function AdminPage() {
   const [copiedId, setCopiedId] = useState<number | null>(null)
 
   const queryClient = useQueryClient()
+  const mainRef = useRef<HTMLElement>(null)
+  const touchStartY = useRef(0)
+  const [pullY, setPullY] = useState(0)
+  const [isPulling, setIsPulling] = useState(false)
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY
+  }
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!mainRef.current || mainRef.current.scrollTop > 0) return
+    const delta = e.touches[0].clientY - touchStartY.current
+    if (delta > 0) {
+      setIsPulling(true)
+      setPullY(Math.min(delta * 0.5, 60))
+    }
+  }
+  const onTouchEnd = async () => {
+    if (pullY >= 50) {
+      await queryClient.invalidateQueries()
+    }
+    setPullY(0)
+    setIsPulling(false)
+  }
 
   const [filterDate, setFilterDate] = useState('')
   const [filterGender, setFilterGender] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
   const [selectedApp, setSelectedApp] = useState<Application | null>(null)
+  const [expandedDates, setExpandedDates] = useState<Record<string, boolean>>({})
+  const toggleDate = (date: string) => setExpandedDates(prev => ({ ...prev, [date]: !prev[date] }))
 
   const {
     data: applications = [],
@@ -198,10 +227,7 @@ export default function AdminPage() {
   const handleCopy = async (app: Application, e: React.MouseEvent) => {
     e.stopPropagation()
     const gender = app.gender === '여성' ? '여' : '남'
-    const nickname = app.name.includes('/')
-      ? app.name.split('/').slice(1).join('/').trim()
-      : app.name.trim()
-    await navigator.clipboard.writeText(`${gender}/${nickname}/${app.birth_year} (인스타)`)
+    await navigator.clipboard.writeText(`${gender}/${app.nickname}/${app.birth_year} (인스타)`)
     setCopiedId(app.id)
     setTimeout(() => setCopiedId(null), 2000)
   }
@@ -214,7 +240,11 @@ export default function AdminPage() {
 
   const deleteApplication = async (id: number) => {
     if (!confirm('신청자를 삭제할까요? 이 작업은 되돌릴 수 없습니다.')) return
-    await supabase.from('applications').delete().eq('id', id)
+    const { error } = await supabase.from('applications').delete().eq('id', id)
+    if (error) {
+      alert(`삭제 실패: ${error.message}`)
+      return
+    }
     setSelectedApp(null)
     queryClient.invalidateQueries({ queryKey: ['applications'] })
   }
@@ -303,7 +333,20 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-black flex justify-center">
-      <main className="w-full max-w-[390px] min-h-screen bg-secondary text-[#f5e2d4] relative pb-10">
+      <main
+        ref={mainRef}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        className="w-full max-w-[390px] min-h-screen bg-secondary text-[#f5e2d4] relative pb-10"
+      >
+        {isPulling && (
+          <div className="flex justify-center items-center" style={{ height: pullY }}>
+            <div
+              className={`w-5 h-5 border-2 border-[#c6beb8]/20 border-t-[#c6beb8] rounded-full ${pullY >= 50 ? 'animate-spin' : ''}`}
+            />
+          </div>
+        )}
         {selectedApp && (
           <DetailModal
             app={selectedApp}
@@ -359,8 +402,7 @@ export default function AdminPage() {
               >
                 <option value="">상태 전체</option>
                 <option value="pending">대기</option>
-                <option value="confirmed">입금완료</option>
-                <option value="rejected">미입금</option>
+                <option value="confirmed">확정</option>
               </select>
               <button
                 onClick={() => refetchApplications()}
@@ -372,7 +414,11 @@ export default function AdminPage() {
 
             {/* 집계 */}
             <div className="px-4 py-3 grid grid-cols-3 gap-2">
-              {(['pending', 'confirmed', 'rejected'] as const).map(s => (
+              <div className="bg-[#2a2220] rounded-2xl py-4 text-center">
+                <p className="text-xs mb-1 text-[#8F8781]">전체</p>
+                <p className="text-2xl font-bold">{applications.length}</p>
+              </div>
+              {(['confirmed', 'pending'] as const).map(s => (
                 <div key={s} className="bg-[#2a2220] rounded-2xl py-4 text-center">
                   <p className="text-xs mb-1" style={{ color: STATUS_COLOR[s] }}>
                     {STATUS_LABEL[s]}
@@ -391,52 +437,102 @@ export default function AdminPage() {
               <p className="text-center text-[#8F8781] text-sm pt-20">신청 내역이 없습니다.</p>
             ) : (
               <div className="px-4 flex flex-col gap-2 pb-4">
-                {applications.map(app => (
-                  <div
-                    key={app.id}
-                    onClick={() => setSelectedApp(app)}
-                    className="w-full bg-[#2a2220] rounded-2xl p-4 text-left flex items-center gap-3 active:opacity-70 cursor-pointer"
-                  >
-                    {app.photo_url ? (
-                      <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0">
-                        <Image src={app.photo_url} alt={app.name} fill className="object-cover" />
-                      </div>
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-[#3a3230] flex items-center justify-center shrink-0">
-                        <span className="text-[#8F8781] text-base">{app.name.charAt(0)}</span>
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        <p className="font-bold text-[#f5e2d4] truncate text-base">{app.name}</p>
-                        <span
-                          className="text-xs font-bold px-2 py-0.5 rounded-full shrink-0"
-                          style={{
-                            backgroundColor: STATUS_COLOR[app.status] + '33',
-                            color: STATUS_COLOR[app.status],
-                          }}
+                {Object.entries(
+                  applications.reduce<Record<string, Application[]>>((acc, app) => {
+                    ;(acc[app.date] ??= []).push(app)
+                    return acc
+                  }, {})
+                )
+                  .sort(([a], [b]) => a.localeCompare(b))
+                  .map(([date, rawApps]) => {
+                    const dateApps = [...rawApps].sort((a, b) =>
+                      b.created_at.localeCompare(a.created_at)
+                    )
+                    const isOpen = !!expandedDates[date]
+                    const confirmed = dateApps.filter(a => a.status === 'confirmed').length
+                    const pending = dateApps.filter(a => a.status === 'pending').length
+                    return (
+                      <div key={date} className="flex flex-col gap-1.5">
+                        {/* 날짜 헤더 토글 */}
+                        <button
+                          onClick={() => toggleDate(date)}
+                          className="w-full bg-[#2a2220] rounded-2xl px-4 py-3.5 flex items-center justify-between active:opacity-70"
                         >
-                          {STATUS_LABEL[app.status]}
-                        </span>
+                          <div className="flex items-center gap-2.5">
+                            <p className="text-[#f5e2d4] font-bold text-sm">{date}</p>
+                            <span className="text-[#8F8781] text-xs">({getDayLabel(date)})</span>
+                            <span className="text-[#8F8781] text-xs">{dateApps.length}명</span>
+                            <span className="text-xs text-[#4ade80]">확정 {confirmed}</span>
+                            <span className="text-xs text-[#c6beb8]">대기 {pending}</span>
+                          </div>
+                          <span
+                            className={`text-[#8F8781] text-xs transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                          >
+                            ▾
+                          </span>
+                        </button>
+
+                        {/* 신청자 목록 */}
+                        {isOpen && (
+                          <div className="flex flex-col gap-1.5 pl-2">
+                            {dateApps.map(app => (
+                              <div
+                                key={app.id}
+                                onClick={() => setSelectedApp(app)}
+                                className="w-full bg-[#2a2220] rounded-2xl p-4 text-left flex items-center gap-3 active:opacity-70 cursor-pointer"
+                              >
+                                {app.photo_url ? (
+                                  <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0">
+                                    <Image
+                                      src={app.photo_url}
+                                      alt={app.name}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className="w-10 h-10 rounded-full bg-[#3a3230] flex items-center justify-center shrink-0">
+                                    <span className="text-[#8F8781] text-base">
+                                      {app.name.charAt(0)}
+                                    </span>
+                                  </div>
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-2 mb-1">
+                                    <p className="font-bold text-[#f5e2d4] truncate text-base">
+                                      {app.name}
+                                    </p>
+                                    <span
+                                      className="text-xs font-bold px-2 py-0.5 rounded-full shrink-0"
+                                      style={{
+                                        backgroundColor: STATUS_COLOR[app.status] + '33',
+                                        color: STATUS_COLOR[app.status],
+                                      }}
+                                    >
+                                      {STATUS_LABEL[app.status]}
+                                    </span>
+                                  </div>
+                                  <p className="text-[#8F8781] text-xs">
+                                    {app.gender} · {app.nickname || app.birth_year}
+                                  </p>
+                                </div>
+                                <button
+                                  onClick={e => handleCopy(app, e)}
+                                  className="shrink-0 text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors"
+                                  style={{
+                                    backgroundColor: copiedId === app.id ? '#4ade80' : '#3a3230',
+                                    color: copiedId === app.id ? '#1a1210' : '#c6beb8',
+                                  }}
+                                >
+                                  {copiedId === app.id ? '복사됨' : '복사'}
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      <p className="text-[#8F8781] text-xs">
-                        {app.date} · {app.gender}
-                      </p>
-                      <p className="text-[#8F8781] text-xs truncate mt-0.5">{app.birth_year}</p>
-                    </div>
-                    {/* 복사 버튼 */}
-                    <button
-                      onClick={e => handleCopy(app, e)}
-                      className="shrink-0 text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors"
-                      style={{
-                        backgroundColor: copiedId === app.id ? '#4ade80' : '#3a3230',
-                        color: copiedId === app.id ? '#1a1210' : '#c6beb8',
-                      }}
-                    >
-                      {copiedId === app.id ? '복사됨' : '복사'}
-                    </button>
-                  </div>
-                ))}
+                    )
+                  })}
               </div>
             )}
           </>

@@ -7,6 +7,7 @@ create table applications (
   date text not null,
   gender text not null,
   name text not null,
+  nickname text not null default '',
   birth_year text not null,
   photo_url text,
   contact text not null,
@@ -24,6 +25,9 @@ create policy "Anyone can select applications"
 
 create policy "Anyone can update applications"
   on applications for update using (true);
+
+create policy "Anyone can delete applications"
+  on applications for delete using (true);
 
 -- =====================
 -- events 테이블 (신청 가능 날짜 관리)

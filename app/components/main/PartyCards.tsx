@@ -8,7 +8,7 @@ export default function PartyCards() {
         <div className="transition-transform duration-300 group-hover:scale-105">
           <Image
             src={'/images/cocktail1.jpeg'}
-            alt={'내향인 파티'}
+            alt={'내향인 파티 신청하기'}
             width={30}
             height={10}
             className="w-full h-auto rounded-2xl"
@@ -17,7 +17,7 @@ export default function PartyCards() {
             sizes="100vw"
           />
           <div className="flex flex-col justify-between gap-4 py-6 text-secondary font-bold px-3">
-            <p className="text-lg font-bold">내향인 파티</p>
+            <p className="text-lg font-bold">내향인 파티 신청하기</p>
             <p className="mt-1.5 text-sm/5 text-secondary/82 font-normal">
               말차 하이볼 / 레몬 하이볼 <br /> 소주 / 맥주 / 논알콜
             </p>
@@ -38,7 +38,7 @@ export default function PartyCards() {
           />
           <div className="flex flex-col justify-between gap-4 py-6 text-[#362617] font-bold px-3">
             <div className="text-lg font-bold">
-              와인 파티 <span className="text-xs">(화이트데이 스페셜)</span>
+              와인 파티 신청하기<span className="text-xs">(3/14 화이트데이 한정) </span>
             </div>{' '}
             <p className="mt-1.5 text-sm/6 text-[#362617]/82 font-normal">
               레드와인 / 화이트 와인 / 논알콜

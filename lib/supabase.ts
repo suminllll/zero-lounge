@@ -11,11 +11,12 @@ export type Application = {
   date: string
   gender: string
   name: string
+  nickname: string
   birth_year: string
   photo_url: string | null
   contact: string
   referral: string
-  status: 'pending' | 'confirmed' | 'rejected'
+  status: 'pending' | 'confirmed'
 }
 
 export type PartyType = 'introvert' | 'wine'
@@ -51,30 +52,25 @@ export type ErrorLog = {
 }
 
 /**
- * 당일 자동 잔여좌석 조정 로직
- * - 소셜링 당일: 여성 -2, 남성 -1
- * - 소셜링 시간 이후: 0
+ * 잔여좌석 표시 로직
  * - 과거 날짜: 0
+ * - 당일 이벤트 시간 이후: 0
+ * - 그 외: DB 값 그대로
  */
 export function getDisplaySeats(event: Event): { female: number; male: number } {
-  const today = new Date().toISOString().split('T')[0]
+  const now = new Date()
+  // KST(UTC+9) 기준 오늘 날짜
+  const kstOffset = 9 * 60 * 60 * 1000
+  const today = new Date(now.getTime() + kstOffset).toISOString().split('T')[0]
 
   if (event.date < today) return { female: 0, male: 0 }
 
   if (event.date === today) {
     const [h, m] = event.time.split(':').map(Number)
-    const now = new Date()
-    // 이벤트 시간은 KST(UTC+9) 기준 → UTC로 변환해 서버/클라이언트 일치
     const eventUTC = new Date()
     const utcHour = h - 9
     eventUTC.setUTCHours(utcHour < 0 ? utcHour + 24 : utcHour, m, 0, 0)
-
     if (now >= eventUTC) return { female: 0, male: 0 }
-
-    return {
-      female: Math.max(0, event.female_seats - 2),
-      male: Math.max(0, event.male_seats - 1),
-    }
   }
 
   return { female: event.female_seats, male: event.male_seats }

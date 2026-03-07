@@ -17,15 +17,9 @@
   /* --color-secondary: #311d0a; */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-
-    --foreground: #ededed;
-  }
-}
 
 body {
+  background-color: #ffffff;
   color: #c6beb8;
   font-family: Arial, Helvetica, sans-serif;
 }

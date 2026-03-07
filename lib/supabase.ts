@@ -58,20 +58,10 @@ export type ErrorLog = {
  * - 그 외: DB 값 그대로
  */
 export function getDisplaySeats(event: Event): { female: number; male: number } {
-  const now = new Date()
   // KST(UTC+9) 기준 오늘 날짜
-  const kstOffset = 9 * 60 * 60 * 1000
-  const today = new Date(now.getTime() + kstOffset).toISOString().split('T')[0]
+  const today = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0]
 
   if (event.date < today) return { female: 0, male: 0 }
-
-  if (event.date === today) {
-    const [h, m] = event.time.split(':').map(Number)
-    const eventUTC = new Date()
-    const utcHour = h - 9
-    eventUTC.setUTCHours(utcHour < 0 ? utcHour + 24 : utcHour, m, 0, 0)
-    if (now >= eventUTC) return { female: 0, male: 0 }
-  }
 
   return { female: event.female_seats, male: event.male_seats }
 }

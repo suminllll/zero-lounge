@@ -5,7 +5,8 @@
       "Bash(/usr/local/bin/node /Users/sumin/Dev_Workspace/zero-lounge/node_modules/.bin/tsc --noEmit)",
       "Bash(npm install @supabase/supabase-js)",
       "Bash(npm install)",
-      "Bash(npm install @tanstack/react-query)"
+      "Bash(npm install @tanstack/react-query)",
+      "Bash(curl -s -X PATCH \"https://vplczffbidkxdlcywrck.supabase.co/rest/v1/events?date=eq.2026-03-08\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwbGN6ZmZiaWRreGRsY3l3cmNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1MTc1MDUsImV4cCI6MjA4ODA5MzUwNX0.S5keA9l7EjniNSqbjOghGEdtlyMpEpP44H-F6DLCOtw\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwbGN6ZmZiaWRreGRsY3l3cmNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1MTc1MDUsImV4cCI6MjA4ODA5MzUwNX0.S5keA9l7EjniNSqbjOghGEdtlyMpEpP44H-F6DLCOtw\" -H \"Content-Type: application/json\" -H \"Prefer: return=representation\" -d '{\"\"female_seats\"\": 2, \"\"male_seats\"\": 1}')"
     ]
   }
 }

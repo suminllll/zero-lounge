@@ -11,7 +11,7 @@ const suit = localFont({
   variable: '--font-suit',
 })
 
-const SITE_URL = 'https://zerolounge.kr' // 배포 후 실제 도메인으로 교체
+const SITE_URL = 'https://zerolounge.kr'
 
 export const metadata: Metadata = {
   title: 'ZERO LOUNGE | 혼자 오는 사람들을 위한 소셜링',
@@ -20,11 +20,13 @@ export const metadata: Metadata = {
     '소셜링',
     '내향인파티',
     '와인파티',
-    '혼술바',
+    '솔로파티',
+    '제로파티',
     '제로라운지',
+    '제로 라운지',
     'ZERO LOUNGE',
     '2030 모임',
-    '솔로파티',
+    '혼술바',
     '서울 혼술바',
     '공덕 혼술바',
     '서울파티',
@@ -67,7 +69,7 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning={true}>
       <body
-        className={`${suit.className} antialiased m-0 p-0 min-h-screen relative bg-secondary`}
+        className={`${suit.className} antialiased m-0 p-0 min-h-screen relative`}
         suppressHydrationWarning={true}
       >
         {/* <div className="fixed top-0 left-0 w-full h-screen -z-10 overflow-hidden md:left-1/2 md:-translate-x-1/2 md:max-w-[390px]">
@@ -82,10 +84,12 @@ export default function RootLayout({
           />
         </div> */}
         <QueryProvider>
-          <div className="relative mx-auto max-w-[390px]">
-            <Header />
-            <main>{children}</main>
-            <ConditionalFooter />
+          <div className="min-h-screen bg-white flex justify-center">
+            <div className="relative w-full max-w-[390px] bg-secondary">
+              <Header />
+              <main>{children}</main>
+              <ConditionalFooter />
+            </div>
           </div>
         </QueryProvider>
       </body>

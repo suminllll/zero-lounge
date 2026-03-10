@@ -43,11 +43,11 @@ export function ApplicationDetailModal({
           content: buildConfirmMessage({ name: app.name, date: app.date, price: smsPrice }),
         }),
       })
+      const data = await res.json()
       if (res.ok) {
-        message.success('문자가 발송되었습니다')
+        message.success(`발송 완료 (${data.data?.statusCode} ${data.data?.statusName ?? ''})`)
       } else {
-        const data = await res.json()
-        message.error(`발송 실패: ${JSON.stringify(data.error)}`)
+        message.error(`발송 실패: ${data.error?.message ?? JSON.stringify(data.error)}`)
       }
     } catch {
       message.error('발송 중 오류가 발생했습니다')

@@ -17,6 +17,8 @@ export type Application = {
   contact: string
   referral: string
   status: 'pending' | 'confirmed'
+  memo: string | null
+  sms_sent: boolean
 }
 
 export type PartyType = 'introvert' | 'wine'

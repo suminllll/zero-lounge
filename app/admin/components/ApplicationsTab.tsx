@@ -54,6 +54,11 @@ export function ApplicationsTab() {
     message.success('날짜가 변경되었습니다')
   }
 
+  const markSmsSent = (id: number) => {
+    if (selectedApp?.id === id) setSelectedApp(prev => (prev ? { ...prev, sms_sent: true } : null))
+    queryClient.invalidateQueries({ queryKey: ['applications'] })
+  }
+
   const deleteApplication = async (id: number) => {
     if (!confirm('정말 삭제하시겠습니까?')) return
     const { error } = await supabase.from('applications').delete().eq('id', id)
@@ -74,6 +79,7 @@ export function ApplicationsTab() {
           onUpdateStatus={updateStatus}
           onDelete={deleteApplication}
           onChangeDate={changeApplicationDate}
+          onSmsSent={markSmsSent}
         />
       )}
 
@@ -206,6 +212,11 @@ export function ApplicationsTab() {
                               {app.gender} · {app.nickname || app.birth_year}
                             </p>
                           </div>
+                          {app.sms_sent && (
+                            <span className="text-xs font-bold px-2 py-1 rounded-full shrink-0 bg-blue-500/20 text-blue-400">
+                              발송
+                            </span>
+                          )}
                           <span
                             className="text-xs font-bold px-2 py-1 rounded-full shrink-0"
                             style={{

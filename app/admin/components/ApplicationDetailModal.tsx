@@ -5,6 +5,8 @@ import Image from 'next/image'
 import { message } from 'antd'
 import type { Application } from '@/lib/supabase'
 import { STATUS_LABEL, STATUS_COLOR, buildConfirmMessage } from '../constants'
+import { logError } from '@/lib/logError'
+import { supabase } from '@/lib/supabase'
 
 interface Props {
   app: Application
@@ -12,6 +14,7 @@ interface Props {
   onUpdateStatus: (id: number, status: Application['status']) => void
   onDelete: (id: number) => void
   onChangeDate: (id: number, newDate: string) => Promise<void>
+  onSmsSent: (id: number) => void
 }
 
 export function ApplicationDetailModal({
@@ -20,6 +23,7 @@ export function ApplicationDetailModal({
   onUpdateStatus,
   onDelete,
   onChangeDate,
+  onSmsSent,
 }: Props) {
   const [smsPrice, setSmsPrice] = useState(45000)
   const [smsSending, setSmsSending] = useState(false)
@@ -27,6 +31,24 @@ export function ApplicationDetailModal({
   const [newDate, setNewDate] = useState(app.date)
   const [dateChanging, setDateChanging] = useState(false)
   const [showDateChange, setShowDateChange] = useState(false)
+  const [memo, setMemo] = useState(app.memo ?? '')
+  const [memoEditing, setMemoEditing] = useState(false)
+  const [memoSaving, setMemoSaving] = useState(false)
+
+  const handleSaveMemo = async () => {
+    setMemoSaving(true)
+    await supabase.from('applications').update({ memo }).eq('id', app.id)
+    setMemoSaving(false)
+    setMemoEditing(false)
+  }
+
+  const handleDeleteMemo = async () => {
+    setMemoSaving(true)
+    await supabase.from('applications').update({ memo: null }).eq('id', app.id)
+    setMemo('')
+    setMemoSaving(false)
+    setMemoEditing(false)
+  }
 
   const handleSendSms = async () => {
     if (!app.contact) {
@@ -46,11 +68,16 @@ export function ApplicationDetailModal({
       const data = await res.json()
       if (res.ok) {
         message.success(`발송 완료 (${data.data?.statusCode} ${data.data?.statusName ?? ''})`)
+        await supabase.from('applications').update({ sms_sent: true }).eq('id', app.id)
+        onSmsSent(app.id)
       } else {
-        message.error(`발송 실패: ${data.error?.message ?? JSON.stringify(data.error)}`)
+        const errMsg = data.error?.message ?? JSON.stringify(data.error)
+        message.error(`발송 실패: ${errMsg}`)
+        logError('/admin', `SMS 발송 실패: ${errMsg}`)
       }
-    } catch {
+    } catch (e) {
       message.error('발송 중 오류가 발생했습니다')
+      logError('/admin', 'SMS 발송 중 예외', e instanceof Error ? e.stack : String(e))
     } finally {
       setSmsSending(false)
     }
@@ -118,6 +145,61 @@ export function ApplicationDetailModal({
           ))}
         </div>
 
+        {/* 메모 */}
+        <div className="bg-[#2a2220] rounded-2xl mb-4 p-4 flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[#c6beb8] text-sm font-medium">메모</span>
+            {!memoEditing && (
+              <button
+                onClick={() => setMemoEditing(true)}
+                className="text-[#8F8781] text-xs px-2 py-1 rounded-lg bg-secondary active:opacity-70"
+              >
+                수정
+              </button>
+            )}
+          </div>
+
+          {memoEditing ? (
+            <>
+              <textarea
+                value={memo}
+                onChange={e => setMemo(e.target.value)}
+                placeholder="메모를 입력하세요"
+                rows={3}
+                autoFocus
+                className="bg-secondary rounded-xl px-3 py-2.5 text-[#f5e2d4] text-sm outline-none resize-none placeholder:text-[#4a3e3a]"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSaveMemo}
+                  disabled={memoSaving}
+                  className="flex-1 py-2 rounded-xl text-sm font-bold text-secondary disabled:opacity-40"
+                  style={{ backgroundColor: '#c6beb8' }}
+                >
+                  {memoSaving ? '...' : '저장'}
+                </button>
+                <button
+                  onClick={handleDeleteMemo}
+                  disabled={memoSaving}
+                  className="px-4 py-2 rounded-xl text-sm font-bold text-[#f87171] bg-[#f87171]/20 disabled:opacity-40"
+                >
+                  삭제
+                </button>
+                <button
+                  onClick={() => { setMemo(app.memo ?? ''); setMemoEditing(false) }}
+                  className="px-4 py-2 rounded-xl text-sm text-[#8F8781] bg-secondary"
+                >
+                  취소
+                </button>
+              </div>
+            </>
+          ) : (
+            <p className="text-[#f5e2d4] text-sm whitespace-pre-wrap min-h-8">
+              {memo || <span className="text-[#4a3e3a]">메모 없음</span>}
+            </p>
+          )}
+        </div>
+
         {/* 날짜 변경 */}
         <div className="bg-[#2a2220] rounded-2xl mb-4 overflow-hidden">
           <button
@@ -125,7 +207,11 @@ export function ApplicationDetailModal({
             className="w-full px-4 py-3 flex items-center justify-between active:opacity-70"
           >
             <span className="text-[#c6beb8] text-sm font-medium">일정 변경</span>
-            <span className={`text-[#8F8781] text-xs transition-transform duration-200 ${showDateChange ? 'rotate-180' : ''}`}>▾</span>
+            <span
+              className={`text-[#8F8781] text-xs transition-transform duration-200 ${showDateChange ? 'rotate-180' : ''}`}
+            >
+              ▾
+            </span>
           </button>
           {showDateChange && (
             <div className="px-4 pb-4 flex gap-2">
@@ -153,26 +239,30 @@ export function ApplicationDetailModal({
             onClick={() => setShowSms(p => !p)}
             className="w-full px-4 py-3 flex items-center justify-between active:opacity-70"
           >
-            <span className="text-[#c6beb8] text-sm font-medium">확정 문자 발송</span>
-            <span className={`text-[#8F8781] text-xs transition-transform duration-200 ${showSms ? 'rotate-180' : ''}`}>▾</span>
+            <span className="text-[#c6beb8] text-sm font-medium">문자 발송</span>
+            <span
+              className={`text-[#8F8781] text-xs transition-transform duration-200 ${showSms ? 'rotate-180' : ''}`}
+            >
+              ▾
+            </span>
           </button>
           {showSms && (
             <div className="px-4 pb-4 flex flex-col gap-2">
               <div className="flex gap-2">
-                <div className="flex-1 bg-secondary rounded-xl px-3 py-2.5 flex items-center gap-1.5">
+                <div className="w-full bg-secondary rounded-xl px-3 py-2.5 flex items-center gap-1.5">
                   <span className="text-[#8F8781] text-xs shrink-0">참가비</span>
                   <input
                     type="number"
                     value={smsPrice}
                     onChange={e => setSmsPrice(Number(e.target.value))}
-                    className="flex-1 bg-transparent text-[#f5e2d4] text-sm outline-none min-w-0"
+                    className=" bg-transparent text-[#f5e2d4] text-sm outline-none min-w-0"
                   />
                   <span className="text-[#8F8781] text-xs shrink-0">원</span>
                 </div>
                 <button
                   onClick={handleSendSms}
                   disabled={smsSending}
-                  className="px-4 py-2.5 rounded-xl text-sm font-bold text-secondary disabled:opacity-40"
+                  className="w-20 px-4 py-2.5 rounded-xl text-sm font-bold text-secondary disabled:opacity-40"
                   style={{ backgroundColor: '#c6beb8' }}
                 >
                   {smsSending ? '...' : '발송'}

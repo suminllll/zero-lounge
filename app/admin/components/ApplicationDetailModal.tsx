@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { message } from 'antd'
 import type { Application } from '@/lib/supabase'
 import { STATUS_LABEL, STATUS_COLOR, buildConfirmMessage } from '../constants'
+import { logError } from '@/lib/logError'
 
 interface Props {
   app: Application
@@ -47,10 +48,13 @@ export function ApplicationDetailModal({
       if (res.ok) {
         message.success(`발송 완료 (${data.data?.statusCode} ${data.data?.statusName ?? ''})`)
       } else {
-        message.error(`발송 실패: ${data.error?.message ?? JSON.stringify(data.error)}`)
+        const errMsg = data.error?.message ?? JSON.stringify(data.error)
+        message.error(`발송 실패: ${errMsg}`)
+        logError('/admin', `SMS 발송 실패: ${errMsg}`)
       }
-    } catch {
+    } catch (e) {
       message.error('발송 중 오류가 발생했습니다')
+      logError('/admin', 'SMS 발송 중 예외', e instanceof Error ? e.stack : String(e))
     } finally {
       setSmsSending(false)
     }
@@ -125,7 +129,11 @@ export function ApplicationDetailModal({
             className="w-full px-4 py-3 flex items-center justify-between active:opacity-70"
           >
             <span className="text-[#c6beb8] text-sm font-medium">일정 변경</span>
-            <span className={`text-[#8F8781] text-xs transition-transform duration-200 ${showDateChange ? 'rotate-180' : ''}`}>▾</span>
+            <span
+              className={`text-[#8F8781] text-xs transition-transform duration-200 ${showDateChange ? 'rotate-180' : ''}`}
+            >
+              ▾
+            </span>
           </button>
           {showDateChange && (
             <div className="px-4 pb-4 flex gap-2">
@@ -153,26 +161,30 @@ export function ApplicationDetailModal({
             onClick={() => setShowSms(p => !p)}
             className="w-full px-4 py-3 flex items-center justify-between active:opacity-70"
           >
-            <span className="text-[#c6beb8] text-sm font-medium">확정 문자 발송</span>
-            <span className={`text-[#8F8781] text-xs transition-transform duration-200 ${showSms ? 'rotate-180' : ''}`}>▾</span>
+            <span className="text-[#c6beb8] text-sm font-medium">문자 발송</span>
+            <span
+              className={`text-[#8F8781] text-xs transition-transform duration-200 ${showSms ? 'rotate-180' : ''}`}
+            >
+              ▾
+            </span>
           </button>
           {showSms && (
             <div className="px-4 pb-4 flex flex-col gap-2">
               <div className="flex gap-2">
-                <div className="flex-1 bg-secondary rounded-xl px-3 py-2.5 flex items-center gap-1.5">
+                <div className="w-full bg-secondary rounded-xl px-3 py-2.5 flex items-center gap-1.5">
                   <span className="text-[#8F8781] text-xs shrink-0">참가비</span>
                   <input
                     type="number"
                     value={smsPrice}
                     onChange={e => setSmsPrice(Number(e.target.value))}
-                    className="flex-1 bg-transparent text-[#f5e2d4] text-sm outline-none min-w-0"
+                    className=" bg-transparent text-[#f5e2d4] text-sm outline-none min-w-0"
                   />
                   <span className="text-[#8F8781] text-xs shrink-0">원</span>
                 </div>
                 <button
                   onClick={handleSendSms}
                   disabled={smsSending}
-                  className="px-4 py-2.5 rounded-xl text-sm font-bold text-secondary disabled:opacity-40"
+                  className="w-20 px-4 py-2.5 rounded-xl text-sm font-bold text-secondary disabled:opacity-40"
                   style={{ backgroundColor: '#c6beb8' }}
                 >
                   {smsSending ? '...' : '발송'}

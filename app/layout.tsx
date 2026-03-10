@@ -4,6 +4,7 @@ import './globals.css'
 import Header from './components/Header'
 import ConditionalFooter from './components/ConditionalFooter'
 import QueryProvider from './components/QueryProvider'
+import GlobalErrorHandler from './components/GlobalErrorHandler'
 
 const suit = localFont({
   src: '../public/fonts/SUIT-Variable.ttf',
@@ -84,6 +85,7 @@ export default function RootLayout({
           />
         </div> */}
         <QueryProvider>
+          <GlobalErrorHandler />
           <div className="min-h-screen bg-white flex justify-center">
             <div className="relative w-full md:max-w-[390px] bg-secondary">
               <Header />

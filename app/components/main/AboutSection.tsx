@@ -16,6 +16,15 @@ const AboutSection = ({ showWine }: AboutSectionProps) => {
     <section className="pt-30 pb-10 flex flex-col gap-20">
       <IntroSection />
 
+      <div>
+        {showWine && (
+          <div className="w-full flex flex-col items-center justify-center mt-25">
+            <p className="mb-10 text-2xl">{'< 대화형 파티 종류 >'}</p>
+            <PartyCards />
+          </div>
+        )}
+      </div>
+
       <WhoSection />
 
       <NoticeSection showWine={showWine} />

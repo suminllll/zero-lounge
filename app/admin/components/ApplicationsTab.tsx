@@ -47,6 +47,13 @@ export function ApplicationsTab() {
     message.success(`${STATUS_LABEL[status]} 되었습니다`)
   }
 
+  const changeApplicationDate = async (id: number, newDate: string) => {
+    await supabase.from('applications').update({ date: newDate }).eq('id', id)
+    if (selectedApp?.id === id) setSelectedApp(prev => (prev ? { ...prev, date: newDate } : null))
+    queryClient.invalidateQueries({ queryKey: ['applications'] })
+    message.success('날짜가 변경되었습니다')
+  }
+
   const deleteApplication = async (id: number) => {
     if (!confirm('정말 삭제하시겠습니까?')) return
     const { error } = await supabase.from('applications').delete().eq('id', id)
@@ -66,6 +73,7 @@ export function ApplicationsTab() {
           onClose={() => setSelectedApp(null)}
           onUpdateStatus={updateStatus}
           onDelete={deleteApplication}
+          onChangeDate={changeApplicationDate}
         />
       )}
 

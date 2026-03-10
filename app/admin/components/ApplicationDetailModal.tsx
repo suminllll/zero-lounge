@@ -6,6 +6,7 @@ import { message } from 'antd'
 import type { Application } from '@/lib/supabase'
 import { STATUS_LABEL, STATUS_COLOR, buildConfirmMessage } from '../constants'
 import { logError } from '@/lib/logError'
+import { supabase } from '@/lib/supabase'
 
 interface Props {
   app: Application
@@ -13,6 +14,7 @@ interface Props {
   onUpdateStatus: (id: number, status: Application['status']) => void
   onDelete: (id: number) => void
   onChangeDate: (id: number, newDate: string) => Promise<void>
+  onSmsSent: (id: number) => void
 }
 
 export function ApplicationDetailModal({
@@ -21,6 +23,7 @@ export function ApplicationDetailModal({
   onUpdateStatus,
   onDelete,
   onChangeDate,
+  onSmsSent,
 }: Props) {
   const [smsPrice, setSmsPrice] = useState(45000)
   const [smsSending, setSmsSending] = useState(false)
@@ -28,6 +31,24 @@ export function ApplicationDetailModal({
   const [newDate, setNewDate] = useState(app.date)
   const [dateChanging, setDateChanging] = useState(false)
   const [showDateChange, setShowDateChange] = useState(false)
+  const [memo, setMemo] = useState(app.memo ?? '')
+  const [memoEditing, setMemoEditing] = useState(false)
+  const [memoSaving, setMemoSaving] = useState(false)
+
+  const handleSaveMemo = async () => {
+    setMemoSaving(true)
+    await supabase.from('applications').update({ memo }).eq('id', app.id)
+    setMemoSaving(false)
+    setMemoEditing(false)
+  }
+
+  const handleDeleteMemo = async () => {
+    setMemoSaving(true)
+    await supabase.from('applications').update({ memo: null }).eq('id', app.id)
+    setMemo('')
+    setMemoSaving(false)
+    setMemoEditing(false)
+  }
 
   const handleSendSms = async () => {
     if (!app.contact) {
@@ -47,6 +68,8 @@ export function ApplicationDetailModal({
       const data = await res.json()
       if (res.ok) {
         message.success(`발송 완료 (${data.data?.statusCode} ${data.data?.statusName ?? ''})`)
+        await supabase.from('applications').update({ sms_sent: true }).eq('id', app.id)
+        onSmsSent(app.id)
       } else {
         const errMsg = data.error?.message ?? JSON.stringify(data.error)
         message.error(`발송 실패: ${errMsg}`)
@@ -120,6 +143,61 @@ export function ApplicationDetailModal({
               <span className="text-[#f5e2d4] flex-1">{value}</span>
             </div>
           ))}
+        </div>
+
+        {/* 메모 */}
+        <div className="bg-[#2a2220] rounded-2xl mb-4 p-4 flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[#c6beb8] text-sm font-medium">메모</span>
+            {!memoEditing && (
+              <button
+                onClick={() => setMemoEditing(true)}
+                className="text-[#8F8781] text-xs px-2 py-1 rounded-lg bg-secondary active:opacity-70"
+              >
+                수정
+              </button>
+            )}
+          </div>
+
+          {memoEditing ? (
+            <>
+              <textarea
+                value={memo}
+                onChange={e => setMemo(e.target.value)}
+                placeholder="메모를 입력하세요"
+                rows={3}
+                autoFocus
+                className="bg-secondary rounded-xl px-3 py-2.5 text-[#f5e2d4] text-sm outline-none resize-none placeholder:text-[#4a3e3a]"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSaveMemo}
+                  disabled={memoSaving}
+                  className="flex-1 py-2 rounded-xl text-sm font-bold text-secondary disabled:opacity-40"
+                  style={{ backgroundColor: '#c6beb8' }}
+                >
+                  {memoSaving ? '...' : '저장'}
+                </button>
+                <button
+                  onClick={handleDeleteMemo}
+                  disabled={memoSaving}
+                  className="px-4 py-2 rounded-xl text-sm font-bold text-[#f87171] bg-[#f87171]/20 disabled:opacity-40"
+                >
+                  삭제
+                </button>
+                <button
+                  onClick={() => { setMemo(app.memo ?? ''); setMemoEditing(false) }}
+                  className="px-4 py-2 rounded-xl text-sm text-[#8F8781] bg-secondary"
+                >
+                  취소
+                </button>
+              </div>
+            </>
+          ) : (
+            <p className="text-[#f5e2d4] text-sm whitespace-pre-wrap min-h-8">
+              {memo || <span className="text-[#4a3e3a]">메모 없음</span>}
+            </p>
+          )}
         </div>
 
         {/* 날짜 변경 */}

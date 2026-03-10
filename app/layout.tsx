@@ -85,7 +85,7 @@ export default function RootLayout({
         </div> */}
         <QueryProvider>
           <div className="min-h-screen bg-white flex justify-center">
-            <div className="relative w-full max-w-[390px] bg-secondary">
+            <div className="relative w-full md:max-w-[390px] bg-secondary">
               <Header />
               <main>{children}</main>
               <ConditionalFooter />

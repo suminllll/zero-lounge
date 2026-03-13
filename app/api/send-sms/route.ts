@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
         'x-ncp-apigw-signature-v2': makeSignature(timestamp),
       },
       body: JSON.stringify({
-        type: 'LMS',
+        type: 'SMS',
         contentType: 'COMM',
         countryCode: '82',
         from: FROM_PHONE,

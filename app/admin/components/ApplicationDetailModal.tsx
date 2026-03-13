@@ -186,7 +186,10 @@ export function ApplicationDetailModal({
                   삭제
                 </button>
                 <button
-                  onClick={() => { setMemo(app.memo ?? ''); setMemoEditing(false) }}
+                  onClick={() => {
+                    setMemo(app.memo ?? '')
+                    setMemoEditing(false)
+                  }}
                   className="px-4 py-2 rounded-xl text-sm text-[#8F8781] bg-secondary"
                 >
                   취소
@@ -249,20 +252,20 @@ export function ApplicationDetailModal({
           {showSms && (
             <div className="px-4 pb-4 flex flex-col gap-2">
               <div className="flex gap-2">
-                <div className="w-full bg-secondary rounded-xl px-3 py-2.5 flex items-center gap-1.5">
+                <div className="flex-1 bg-secondary rounded-xl px-3 py-2.5 flex items-center gap-1.5">
                   <span className="text-[#8F8781] text-xs shrink-0">참가비</span>
                   <input
                     type="number"
                     value={smsPrice}
                     onChange={e => setSmsPrice(Number(e.target.value))}
-                    className=" bg-transparent text-[#f5e2d4] text-sm outline-none min-w-0"
+                    className="w-full bg-transparent text-[#f5e2d4] text-sm outline-none min-w-0"
                   />
                   <span className="text-[#8F8781] text-xs shrink-0">원</span>
                 </div>
                 <button
                   onClick={handleSendSms}
                   disabled={smsSending}
-                  className="w-20 px-4 py-2.5 rounded-xl text-sm font-bold text-secondary disabled:opacity-40"
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-secondary disabled:opacity-40"
                   style={{ backgroundColor: '#c6beb8' }}
                 >
                   {smsSending ? '...' : '발송'}

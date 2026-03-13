@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     method: 'POST',
     headers: ncpHeaders('POST', sendPath),
     body: JSON.stringify({
-      type: 'SMS',
+      type: 'LMS',
       contentType: 'COMM',
       countryCode: '82',
       from: FROM_PHONE,

@@ -34,6 +34,7 @@ export function ApplicationDetailModal({
   const [memo, setMemo] = useState(app.memo ?? '')
   const [memoEditing, setMemoEditing] = useState(false)
   const [memoSaving, setMemoSaving] = useState(false)
+  const [showMemo, setShowMemo] = useState(false)
 
   const handleSaveMemo = async () => {
     setMemoSaving(true)
@@ -112,7 +113,7 @@ export function ApplicationDetailModal({
         </div>
 
         {app.photo_url ? (
-          <a href={app.photo_url} target="_blank" rel="noopener noreferrer" className="block mb-5">
+          <a href={app.photo_url} target="_blank" rel="noopener noreferrer" className="block mb-3">
             <Image
               src={app.photo_url}
               alt="신청자 사진"
@@ -123,10 +124,34 @@ export function ApplicationDetailModal({
             <p className="text-[#8F8781] text-xs text-center mt-1.5">탭하면 원본 보기</p>
           </a>
         ) : (
-          <div className="w-full h-24 bg-[#2a2220] rounded-2xl flex items-center justify-center mb-5">
+          <div className="w-full h-24 bg-[#2a2220] rounded-2xl flex items-center justify-center mb-3">
             <p className="text-[#4a3e3a] text-sm">사진 없음</p>
           </div>
         )}
+
+        {/* 상태 버튼 */}
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          <button
+            onClick={() => onUpdateStatus(app.id, 'confirmed')}
+            className={`py-4 rounded-2xl text-sm font-bold text-secondary ${app.status === 'confirmed' ? 'ring-2 ring-white/30' : ''}`}
+            style={{ backgroundColor: STATUS_COLOR['confirmed'] }}
+          >
+            확정
+          </button>
+          <button
+            onClick={() => onDelete(app.id)}
+            className="py-4 rounded-2xl text-sm font-bold text-[#f87171] bg-[#f87171]/20"
+          >
+            삭제
+          </button>
+          <button
+            onClick={() => onUpdateStatus(app.id, 'pending')}
+            className={`py-4 rounded-2xl text-sm font-bold text-secondary ${app.status === 'pending' ? 'ring-2 ring-white/30' : ''}`}
+            style={{ backgroundColor: STATUS_COLOR['pending'] }}
+          >
+            대기
+          </button>
+        </div>
 
         <div className="bg-[#2a2220] rounded-2xl p-4 flex flex-col gap-3 text-sm mb-4">
           {[
@@ -143,97 +168,6 @@ export function ApplicationDetailModal({
               <span className="text-[#f5e2d4] flex-1">{value}</span>
             </div>
           ))}
-        </div>
-
-        {/* 메모 */}
-        <div className="bg-[#2a2220] rounded-2xl mb-4 p-4 flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[#c6beb8] text-sm font-medium">메모</span>
-            {!memoEditing && (
-              <button
-                onClick={() => setMemoEditing(true)}
-                className="text-[#8F8781] text-xs px-2 py-1 rounded-lg bg-secondary active:opacity-70"
-              >
-                수정
-              </button>
-            )}
-          </div>
-
-          {memoEditing ? (
-            <>
-              <textarea
-                value={memo}
-                onChange={e => setMemo(e.target.value)}
-                placeholder="메모를 입력하세요"
-                rows={3}
-                autoFocus
-                className="bg-secondary rounded-xl px-3 py-2.5 text-[#f5e2d4] text-sm outline-none resize-none placeholder:text-[#4a3e3a]"
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={handleSaveMemo}
-                  disabled={memoSaving}
-                  className="flex-1 py-2 rounded-xl text-sm font-bold text-secondary disabled:opacity-40"
-                  style={{ backgroundColor: '#c6beb8' }}
-                >
-                  {memoSaving ? '...' : '저장'}
-                </button>
-                <button
-                  onClick={handleDeleteMemo}
-                  disabled={memoSaving}
-                  className="px-4 py-2 rounded-xl text-sm font-bold text-[#f87171] bg-[#f87171]/20 disabled:opacity-40"
-                >
-                  삭제
-                </button>
-                <button
-                  onClick={() => {
-                    setMemo(app.memo ?? '')
-                    setMemoEditing(false)
-                  }}
-                  className="px-4 py-2 rounded-xl text-sm text-[#8F8781] bg-secondary"
-                >
-                  취소
-                </button>
-              </div>
-            </>
-          ) : (
-            <p className="text-[#f5e2d4] text-sm whitespace-pre-wrap min-h-8">
-              {memo || <span className="text-[#4a3e3a]">메모 없음</span>}
-            </p>
-          )}
-        </div>
-
-        {/* 날짜 변경 */}
-        <div className="bg-[#2a2220] rounded-2xl mb-4 overflow-hidden">
-          <button
-            onClick={() => setShowDateChange(p => !p)}
-            className="w-full px-4 py-3 flex items-center justify-between active:opacity-70"
-          >
-            <span className="text-[#c6beb8] text-sm font-medium">일정 변경</span>
-            <span
-              className={`text-[#8F8781] text-xs transition-transform duration-200 ${showDateChange ? 'rotate-180' : ''}`}
-            >
-              ▾
-            </span>
-          </button>
-          {showDateChange && (
-            <div className="px-4 pb-4 flex gap-2">
-              <input
-                type="date"
-                value={newDate}
-                onChange={e => setNewDate(e.target.value)}
-                className="flex-1 bg-secondary rounded-xl px-3 py-2.5 text-[#f5e2d4] text-sm outline-none"
-              />
-              <button
-                onClick={handleChangeDate}
-                disabled={newDate === app.date || dateChanging}
-                className="px-4 py-2.5 rounded-xl text-sm font-bold text-secondary disabled:opacity-40"
-                style={{ backgroundColor: '#c6beb8' }}
-              >
-                {dateChanging ? '...' : '변경'}
-              </button>
-            </div>
-          )}
         </div>
 
         {/* 문자 발송 */}
@@ -271,36 +205,112 @@ export function ApplicationDetailModal({
                   {smsSending ? '...' : '발송'}
                 </button>
               </div>
-              <p className="text-[#4a3e3a] text-xs leading-relaxed whitespace-pre-wrap">
-                {buildConfirmMessage({ name: app.name, date: app.date, price: smsPrice })}
-              </p>
             </div>
           )}
         </div>
 
-        {/* 상태 버튼 */}
-        <div className="grid grid-cols-3 gap-2">
+        {/* 날짜 변경 */}
+        <div className="bg-[#2a2220] rounded-2xl mb-4 overflow-hidden">
           <button
-            onClick={() => onUpdateStatus(app.id, 'confirmed')}
-            className={`py-4 rounded-2xl text-sm font-bold text-secondary ${app.status === 'confirmed' ? 'ring-2 ring-white/30' : ''}`}
-            style={{ backgroundColor: STATUS_COLOR['confirmed'] }}
+            onClick={() => setShowDateChange(p => !p)}
+            className="w-full px-4 py-3 flex items-center justify-between active:opacity-70"
           >
-            확정
+            <span className="text-[#c6beb8] text-sm font-medium">일정 변경</span>
+            <span
+              className={`text-[#8F8781] text-xs transition-transform duration-200 ${showDateChange ? 'rotate-180' : ''}`}
+            >
+              ▾
+            </span>
           </button>
-          <button
-            onClick={() => onDelete(app.id)}
-            className="py-4 rounded-2xl text-sm font-bold text-[#f87171] bg-[#f87171]/20"
-          >
-            삭제
-          </button>
-          <button
-            onClick={() => onUpdateStatus(app.id, 'pending')}
-            className={`py-4 rounded-2xl text-sm font-bold text-secondary ${app.status === 'pending' ? 'ring-2 ring-white/30' : ''}`}
-            style={{ backgroundColor: STATUS_COLOR['pending'] }}
-          >
-            대기
-          </button>
+          {showDateChange && (
+            <div className="px-4 pb-4 flex gap-2">
+              <input
+                type="date"
+                value={newDate}
+                onChange={e => setNewDate(e.target.value)}
+                className="flex-1 bg-secondary rounded-xl px-3 py-2.5 text-[#f5e2d4] text-sm outline-none"
+              />
+              <button
+                onClick={handleChangeDate}
+                disabled={newDate === app.date || dateChanging}
+                className="px-4 py-2.5 rounded-xl text-sm font-bold text-secondary disabled:opacity-40"
+                style={{ backgroundColor: '#c6beb8' }}
+              >
+                {dateChanging ? '...' : '변경'}
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* 메모 */}
+        <div className="bg-[#2a2220] rounded-2xl mb-4 overflow-hidden">
+          <button
+            onClick={() => setShowMemo(p => !p)}
+            className="w-full px-4 py-3 flex items-center justify-between active:opacity-70"
+          >
+            <span className="text-[#c6beb8] text-sm font-medium">메모</span>
+            <span
+              className={`text-[#8F8781] text-xs transition-transform duration-200 ${showMemo ? 'rotate-180' : ''}`}
+            >
+              ▾
+            </span>
+          </button>
+          {showMemo && (
+            <div className="px-4 pb-4 flex flex-col gap-2">
+              {memoEditing ? (
+                <>
+                  <textarea
+                    value={memo}
+                    onChange={e => setMemo(e.target.value)}
+                    placeholder="메모를 입력하세요"
+                    rows={3}
+                    autoFocus
+                    className="bg-secondary rounded-xl px-3 py-2.5 text-[#f5e2d4] text-sm outline-none resize-none placeholder:text-[#4a3e3a]"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveMemo}
+                      disabled={memoSaving}
+                      className="flex-1 py-2 rounded-xl text-sm font-bold text-secondary disabled:opacity-40"
+                      style={{ backgroundColor: '#c6beb8' }}
+                    >
+                      {memoSaving ? '...' : '저장'}
+                    </button>
+                    <button
+                      onClick={handleDeleteMemo}
+                      disabled={memoSaving}
+                      className="px-4 py-2 rounded-xl text-sm font-bold text-[#f87171] bg-[#f87171]/20 disabled:opacity-40"
+                    >
+                      삭제
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMemo(app.memo ?? '')
+                        setMemoEditing(false)
+                      }}
+                      className="px-4 py-2 rounded-xl text-sm text-[#8F8781] bg-secondary"
+                    >
+                      취소
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-[#f5e2d4] text-sm whitespace-pre-wrap min-h-8">
+                    {memo || <span className="text-[#4a3e3a]">메모 없음</span>}
+                  </p>
+                  <button
+                    onClick={() => setMemoEditing(true)}
+                    className="self-start text-[#8F8781] text-xs px-2 py-1 rounded-lg bg-secondary active:opacity-70"
+                  >
+                    수정
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   )

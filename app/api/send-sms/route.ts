@@ -49,31 +49,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: data }, { status: res.status })
   }
 
-  const requestId = data.requestId
-
-  // 3초 후 실제 수신 결과 조회
-  await new Promise(r => setTimeout(r, 3000))
-
-  const statusPath = `/sms/v2/services/${SERVICE_ID}/messages?requestId=${requestId}`
-  const statusRes = await fetch(`https://sens.apigw.ntruss.com${statusPath}`, {
-    method: 'GET',
-    headers: ncpHeaders('GET', statusPath),
-  })
-
-  if (!statusRes.ok) {
-    // 상태 조회 실패시 접수 성공으로 처리
-    return NextResponse.json({ success: true, data })
-  }
-
-  const statusData = await statusRes.json()
-  const msgStatus = statusData.messages?.[0]
-
-  if (msgStatus?.statusCode === '1') {
-    return NextResponse.json({ success: true, statusName: '수신 성공' })
-  } else {
-    return NextResponse.json(
-      { error: { message: `수신 실패: ${msgStatus?.statusName ?? '알 수 없음'} (${msgStatus?.statusCode})` } },
-      { status: 400 }
-    )
-  }
+  return NextResponse.json({ success: true })
 }

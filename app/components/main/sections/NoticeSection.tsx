@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 interface NoticeSectionProps {
   showWine: boolean
 }
@@ -29,7 +31,7 @@ export default function NoticeSection({ showWine }: NoticeSectionProps) {
             <div>
               <p className="font-bold text-base">제공 주류</p>
               <p className="text-base mt-1 font-light leading-6">
-                말차 하이볼 / 얼그레이 하이볼 /<br /> 소주 / 맥주 무제한
+                말차 하이볼 / 레몬 하이볼 /<br /> 소주 / 맥주 무제한
               </p>
             </div>
             <div>
@@ -42,7 +44,7 @@ export default function NoticeSection({ showWine }: NoticeSectionProps) {
         <div>
           <p className="font-bold text-base">일정</p>
           <p className="text-base mt-1 font-light leading-6">
-            금요일 8시 <br /> 토.일요일 6시 30분
+            목.금요일 8시 <br /> 토.일요일 6시 30분
           </p>
         </div>
         <div>
@@ -64,6 +66,15 @@ export default function NoticeSection({ showWine }: NoticeSectionProps) {
           <p className="text-base mt-1 font-light">37세까지만 받을게요.</p>
         </div>
       </div>
+      <Link
+        href="/apply"
+        className="mt-6 flex items-center justify-between w-full py-4 px-6 rounded-[80px] font-bold text-secondary text-base"
+        style={{ backgroundColor: '#c6beb8' }}
+      >
+        <span />
+        <span>소셜링 신청하기</span>
+        <span>&gt;</span>
+      </Link>
     </div>
   )
 }

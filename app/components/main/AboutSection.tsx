@@ -33,10 +33,9 @@ const AboutSection = ({ showWine }: AboutSectionProps) => {
 
       <GallerySliderWrapper />
 
-      <div id="party-cards" className="w-full flex justify-center mt-25">
-        {showWine && <PartyCards />}
+      <div id="party-cards" className="w-full flex justify-center ">
+        <PartyCards showWine={showWine} />
       </div>
-
       <QnaSection />
 
       <p className="text-center text-xl font-bold leading-snug">우리, 곧 만나요.</p>

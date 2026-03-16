@@ -1,7 +1,11 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-export default function PartyCards() {
+interface PartyCardsProps {
+  showWine?: boolean
+}
+
+export default function PartyCards({ showWine = true }: PartyCardsProps) {
   return (
     <div className="relative z-10 w-[90%] max-w-4xl flex flex-col gap-5 ">
       <Link href="/party/introvert" className="glass-card-v2 p-5 cursor-pointer group">
@@ -24,28 +28,30 @@ export default function PartyCards() {
           </div>
         </div>
       </Link>
-      <Link href="/party/wine" className="glass-card-v2 p-5 cursor-pointer group">
-        <div className="transition-transform duration-300 group-hover:scale-105">
-          <Image
-            src={'/images/wine.jpeg'}
-            alt={'와인 파티'}
-            width={30}
-            height={10}
-            className="w-full h-auto rounded-2xl"
-            priority
-            quality={95}
-            sizes="100vw"
-          />
-          <div className="flex flex-col justify-between gap-4 py-6 text-[#362617] font-bold px-3">
-            <div className="text-lg font-bold">
-              와인 파티 신청하기<span className="text-xs">(3/14 화이트데이 한정) </span>
-            </div>{' '}
-            <p className="mt-1.5 text-sm/6 text-[#362617]/82 font-normal">
-              레드와인 / 화이트 와인 / 논알콜
-            </p>
+      {showWine && (
+        <Link href="/party/wine" className="glass-card-v2 p-5 cursor-pointer group">
+          <div className="transition-transform duration-300 group-hover:scale-105">
+            <Image
+              src={'/images/wine.jpeg'}
+              alt={'와인 파티'}
+              width={30}
+              height={10}
+              className="w-full h-auto rounded-2xl"
+              priority
+              quality={95}
+              sizes="100vw"
+            />
+            <div className="flex flex-col justify-between gap-4 py-6 text-[#362617] font-bold px-3">
+              <div className="text-lg font-bold">
+                와인 파티 신청하기<span className="text-xs">(3/14 화이트데이 한정) </span>
+              </div>{' '}
+              <p className="mt-1.5 text-sm/6 text-[#362617]/82 font-normal">
+                레드와인 / 화이트 와인 / 논알콜
+              </p>
+            </div>
           </div>
-        </div>
-      </Link>
+        </Link>
+      )}
     </div>
   )
 }

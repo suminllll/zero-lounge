@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
 import Header from './components/Header'
@@ -13,6 +13,13 @@ const suit = localFont({
 })
 
 const SITE_URL = 'https://zerolounge.kr'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
 
 export const metadata: Metadata = {
   title: 'ZERO LOUNGE | 혼자 오는 사람들을 위한 소셜링',

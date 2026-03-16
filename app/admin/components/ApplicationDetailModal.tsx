@@ -68,7 +68,7 @@ export function ApplicationDetailModal({
       })
       const data = await res.json()
       if (res.ok) {
-        message.success(`발송 완료 (${data.data?.statusCode} ${data.data?.statusName ?? ''})`)
+        message.success('발송 완료')
         await supabase.from('applications').update({ sms_sent: true }).eq('id', app.id)
         onSmsSent(app.id)
       } else {

@@ -29,7 +29,7 @@ export function PartiesTab() {
       ) : (
         <div className="flex flex-col gap-3">
           {[
-            { type: 'introvert', label: '내향인 파티', sub: '얼그레이 · 말차 하이볼' },
+            { type: 'introvert', label: '내향인 파티', sub: '레몬 · 말차 하이볼' },
             { type: 'wine', label: '와인 파티', sub: '레드 · 화이트 와인' },
           ].map(({ type, label, sub }) => {
             const setting = partySettings.find(p => p.party_type === type)

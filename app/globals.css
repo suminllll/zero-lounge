@@ -107,6 +107,39 @@ body {
 .step-forward  { animation: stepForward  0.4s ease-out both; }
 .step-backward { animation: stepBackward 0.4s ease-out both; }
 
+/* 소셜링 신청하기 버튼 애니메이션 */
+@keyframes applyShimmer {
+  0% { transform: translateX(-150%); }
+  100% { transform: translateX(350%); }
+}
+
+@keyframes arrowFloat {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+.apply-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.apply-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: applyShimmer 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.apply-btn-arrow {
+  display: inline-block;
+  animation: arrowFloat 1.2s ease-in-out infinite;
+}
+
 .glass-card-v2::after {
   content: '';
   position: absolute;

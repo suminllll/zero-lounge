@@ -68,12 +68,12 @@ export default function NoticeSection({ showWine }: NoticeSectionProps) {
       </div>
       <Link
         href="/apply"
-        className="mt-6 flex items-center justify-between w-full py-4 px-6 rounded-[80px] font-bold text-secondary text-base"
+        className="apply-btn mt-10 flex items-center justify-between w-full py-4 px-6 rounded-[80px] font-bold text-secondary text-base"
         style={{ backgroundColor: '#c6beb8' }}
       >
         <span />
         <span>소셜링 신청하기</span>
-        <span>&gt;</span>
+        <span className="apply-btn-arrow">&gt;</span>
       </Link>
     </div>
   )

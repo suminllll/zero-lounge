@@ -3,9 +3,9 @@ import Image from 'next/image'
 const HeroSection = () => {
   return (
     <section className="relative">
-      <div className="relative h-[50vh] bg-[#2a2220]">
+      <div className="relative h-[68vh] bg-[#2a2220]">
         <Image
-          src={'/images/heroSlide1.jpg'}
+          src={'/images/heroSlide9.png'}
           alt={'hero side1'}
           fill
           className="object-cover object-center"

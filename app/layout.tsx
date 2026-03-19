@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     siteName: 'ZERO LOUNGE',
     images: [
       {
-        url: '/images/heroSlide1.jpg',
+        url: '/images/heroSlide.png',
         width: 1200,
         height: 630,
         alt: 'ZERO LOUNGE 소셜링',
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'ZERO LOUNGE | 혼자 와도 괜찮아요',
     description: '낯선 사람이 편한 사람이 되는 자리. 내향인을 위한 소셜 파티.',
-    images: ['/images/heroSlide1.jpg'],
+    images: ['/images/heroSlide.png'],
   },
   robots: {
     index: true,

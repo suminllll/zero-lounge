@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
+import Script from 'next/script'
 import './globals.css'
 import Header from './components/Header'
 import ConditionalFooter from './components/ConditionalFooter'
@@ -67,6 +68,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  verification: {
+    google: '4IDDj0wNtop3EMfhpP1hpjkYyai7Pjajo3uJCzhqc6k',
+  },
 }
 
 export default function RootLayout({
@@ -76,6 +80,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning={true}>
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-LB2VRJ71M2"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-LB2VRJ71M2');
+          `}
+        </Script>
+      </head>
       <body
         className={`${suit.className} antialiased m-0 p-0 min-h-screen relative`}
         suppressHydrationWarning={true}

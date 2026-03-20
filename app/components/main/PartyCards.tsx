@@ -8,7 +8,11 @@ interface PartyCardsProps {
 export default function PartyCards({ showWine = true }: PartyCardsProps) {
   return (
     <div className="relative z-10 w-[90%] max-w-4xl flex flex-col gap-5 ">
-      <Link href="/party/introvert" className="glass-card-v2 p-5 cursor-pointer group">
+      <Link
+        href="/party/introvert"
+        className="glass-card-v2 p-5 cursor-pointer group"
+        id="detail_view_btn"
+      >
         <div className="transition-transform duration-300 group-hover:scale-105">
           <Image
             src={'/images/cocktail1.jpeg'}

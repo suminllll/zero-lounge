@@ -34,6 +34,7 @@ export default function ScheduleButton({ showWine }: ScheduleButtonProps) {
       onClick={handleClick}
       className={`fixed bottom-6 w-[90%] max-w-[350px] left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-full font-bold text-secondary text-base text-center shadow-lg whitespace-nowrap transition-all duration-300 ${hidden ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'}`}
       style={{ backgroundColor: '#c6beb8' }}
+      id="main_float_apply_btn"
     >
       일정 확인하기
     </button>

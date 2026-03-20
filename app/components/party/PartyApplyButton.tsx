@@ -17,10 +17,9 @@ export default function PartyApplyButton({ href }: PartyApplyButtonProps) {
   useEffect(() => {
     const el = anchorRef.current
     if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => setStaticVisible(entry.isIntersecting),
-      { threshold: 0.5 }
-    )
+    const observer = new IntersectionObserver(([entry]) => setStaticVisible(entry.isIntersecting), {
+      threshold: 0.5,
+    })
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
@@ -30,16 +29,18 @@ export default function PartyApplyButton({ href }: PartyApplyButtonProps) {
       {/* Floating button */}
       <div
         className={`fixed bottom-6 w-[90%] max-w-[350px] left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
-          staticVisible ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
+          staticVisible
+            ? 'opacity-0 pointer-events-none translate-y-4'
+            : 'opacity-100 translate-y-0'
         }`}
       >
-        <a href={href} className={btnClass} style={btnStyle}>
+        <a href={href} className={btnClass} style={btnStyle} id="detail_apply_btn">
           소셜링 신청하기
         </a>
       </div>
 
       {/* Static anchor button */}
-      <div ref={anchorRef} className="px-5 pb-10">
+      <div ref={anchorRef} className="px-5 pb-10" id="detail_apply_btn">
         <a href={href} className={btnClass} style={btnStyle}>
           소셜링 신청하기
         </a>

@@ -84,6 +84,13 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning={true}>
       <head>
+        <Script id="google-tag-manager" strategy="afterInteractive">
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KFQJJ6MS');`}
+        </Script>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-LB2VRJ71M2"
           strategy="afterInteractive"
@@ -101,6 +108,14 @@ export default function RootLayout({
         className={`${suit.className} antialiased m-0 p-0 min-h-screen relative`}
         suppressHydrationWarning={true}
       >
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-KFQJJ6MS"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
         {/* <div className="fixed top-0 left-0 w-full h-screen -z-10 overflow-hidden md:left-1/2 md:-translate-x-1/2 md:max-w-[390px]">
           <Image
             src="/images/bgImgae.jpeg"

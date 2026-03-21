@@ -15,10 +15,24 @@ export default function ScheduleButton({ showWine }: ScheduleButtonProps) {
     const handleScroll = () => {
       const scrolled = window.scrollY + window.innerHeight
       const total = document.documentElement.scrollHeight
-      setHidden(scrolled >= total - 80)
+      const nearBottom = scrolled >= total - 80
+
+      const isVisible = (id: string) => {
+        const el = document.getElementById(id)
+        if (!el) return false
+        const rect = el.getBoundingClientRect()
+        return rect.top < window.innerHeight && rect.bottom > 0
+      }
+
+      setHidden(nearBottom || isVisible('main_apply_btn') || isVisible('hero_apply_btn') || isVisible('gallery_apply_btn'))
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('touchmove', handleScroll, { passive: true })
+    handleScroll()
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('touchmove', handleScroll)
+    }
   }, [])
 
   const handleClick = () => {
@@ -36,7 +50,7 @@ export default function ScheduleButton({ showWine }: ScheduleButtonProps) {
       style={{ backgroundColor: '#c6beb8' }}
       id="main_float_apply_btn"
     >
-      일정 확인하기
+      이번주 잔여셕 확인하기
     </button>
   )
 }

@@ -6,7 +6,7 @@ interface NoticeSectionProps {
 
 export default function NoticeSection({ showWine }: NoticeSectionProps) {
   return (
-    <div className=" w-[90%] mx-auto rounded-3xl px-6">
+    <div className=" w-[90%] mx-auto rounded-3xl px-6 ">
       <p className="text-center text-3xl font-bold italic text-primary mb-8 tracking-widest">
         NOTICE
       </p>
@@ -66,14 +66,18 @@ export default function NoticeSection({ showWine }: NoticeSectionProps) {
           <p className="text-base mt-1 font-light">37세까지만 받을게요.</p>
         </div>
       </div>
+      <p className="text-center mt-15">
+        <span className="urgent-pulse text-[#ddc5ad] font-bold">이번 주 남은 자리 3석!</span>
+      </p>
       <Link
+        id="main_2_btn"
         href="/apply"
-        className="apply-btn mt-10 flex items-center justify-between w-full py-4 px-6 rounded-[80px] font-bold text-secondary text-base"
+        className="mt-5 flex items-center justify-between w-full py-4 px-6 rounded-[80px] font-bold text-secondary text-base"
         style={{ backgroundColor: '#c6beb8' }}
       >
         <span />
         <span>소셜링 신청하기</span>
-        <span className="apply-btn-arrow">&gt;</span>
+        <span>&gt;</span>
       </Link>
     </div>
   )

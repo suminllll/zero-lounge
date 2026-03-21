@@ -3,7 +3,7 @@ import Image from 'next/image'
 export default function IntroSection() {
   return (
     <>
-      <h1 className="font-medium text-lg leading-7 break-all whitespace-pre-wrap px-[15px] pb-10">
+      <h1 className="font-medium text-lg leading-7 break-all whitespace-pre-wrap px-[15px] pb-10 text-[#eac59e]">
         낯선 사람이 편한 사람이 되는 자리.
         <br />
         <br />
@@ -17,7 +17,7 @@ export default function IntroSection() {
       </h1>
 
       <div>
-        <div className="relative w-full h-[370px] mx-auto bg-[#2a2220]">
+        {/* <div className="relative w-full h-[370px] mx-auto bg-[#2a2220]">
           <Image
             src={'/images/heroMain1.jpg'}
             alt={'heroMain1'}
@@ -27,12 +27,12 @@ export default function IntroSection() {
             sizes="100vw"
           />
           <p className="absolute top-3 right-6 text-xs text-white">ZERO LOUNGE</p>
-          <p className="absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap font-light text-white">
+          <p className="absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap font-light text-[#eac59e]]">
             사람과 시간의 밀도를 중요하게 생각하는 소셜링 입니다.
           </p>
-        </div>
+        </div> */}
 
-        <p className="mt-20 text-base leading-6 px-[15px]  font-medium">
+        {/* <p className="mt-20 text-base leading-6 px-[15px]  font-medium">
           요즘은 사람을
           <br /> 어디에서 만나야 할지 잘 모르겠어요.
           <br />
@@ -60,9 +60,9 @@ export default function IntroSection() {
           거창한 만남이 아니라
           <br />
           편하게 이야기할 수 있는 자리일지도 모르니까요.
-        </p>
+        </p> */}
 
-        <div className="relative w-full h-[481px] mx-auto mt-20 bg-[#2a2220]">
+        <div className="relative w-full h-[481px] mx-auto  bg-[#2a2220]">
           <Image
             src={'/images/IMG_5056 1.png'}
             alt={'heroMain2'}

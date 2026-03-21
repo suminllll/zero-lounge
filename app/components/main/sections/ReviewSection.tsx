@@ -14,7 +14,7 @@ const REVIEWS = [
 export default function ReviewSection() {
   return (
     <div className="pt-16 px-5">
-      <h2 className="text-center text-2xl font-bold leading-snug mb-12">
+      <h2 className="text-center text-2xl font-bold leading-snug mb-12 text-primary">
         1,000명 이상 다녀가신 소셜링. <br />
         게스트 분들이
         <br />
@@ -34,7 +34,7 @@ export default function ReviewSection() {
         ))}
       </div>
 
-      <p className="text-center text-base mt-12 leading-7">
+      <p className="text-center mt-12 leading-7 text-xl">
         매일 보는 익숙한 사람들 말고,
         <br />
         가끔은 새로운 사람들과 이야기해요.

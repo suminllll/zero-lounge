@@ -19,7 +19,7 @@ const QNA_LIST = [
 
 export default function QnaSection() {
   return (
-    <div className="mb-30 px-5">
+    <div className="mb-30 px-5 text-primary">
       <p className="text-3xl font-bold leading-snug mb-2">QnA</p>
       {QNA_LIST.map((item, i) => (
         <div key={i} className="font-medium mb-2">

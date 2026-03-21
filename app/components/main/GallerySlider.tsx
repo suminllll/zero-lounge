@@ -31,7 +31,7 @@ export default function GallerySlider() {
 
   return (
     <div className="mt-12">
-      <p className="pl-[4vw] text-lg font-bold mb-4">소셜링 갤러리</p>
+      <p className="pl-[4vw] text-lg font-bold mb-4 text-primary">소셜링 갤러리</p>
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex gap-3 px-4">
           {images.map((src, i) => (

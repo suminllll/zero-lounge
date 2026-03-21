@@ -10,13 +10,12 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --color-primary: #c6beb8;
+  --color-primary: #edd0b1;
   --color-secondary: #1f1001;
   /* --color-secondary: #251607; */
 
   /* --color-secondary: #311d0a; */
 }
-
 
 body {
   background-color: #ffffff;
@@ -97,25 +96,50 @@ body {
 
 /* Step 애니메이션 */
 @keyframes stepForward {
-  from { transform: translateX(40px); opacity: 0; }
-  to   { transform: translateX(0);    opacity: 1; }
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 @keyframes stepBackward {
-  from { transform: translateX(-40px); opacity: 0; }
-  to   { transform: translateX(0);     opacity: 1; }
+  from {
+    transform: translateX(-40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
-.step-forward  { animation: stepForward  0.4s ease-out both; }
-.step-backward { animation: stepBackward 0.4s ease-out both; }
+.step-forward {
+  animation: stepForward 0.4s ease-out both;
+}
+.step-backward {
+  animation: stepBackward 0.4s ease-out both;
+}
 
 /* 소셜링 신청하기 버튼 애니메이션 */
 @keyframes applyShimmer {
-  0% { transform: translateX(-150%); }
-  100% { transform: translateX(350%); }
+  0% {
+    transform: translateX(-150%);
+  }
+  100% {
+    transform: translateX(350%);
+  }
 }
 
 @keyframes arrowFloat {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(5px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(5px);
+  }
 }
 
 .apply-btn {
@@ -138,6 +162,22 @@ body {
 .apply-btn-arrow {
   display: inline-block;
   animation: arrowFloat 1.2s ease-in-out infinite;
+}
+
+@keyframes urgentPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.75;
+  }
+}
+
+.urgent-pulse {
+  display: inline-block;
+  animation: urgentPulse 1.6s ease-in-out infinite;
 }
 
 .glass-card-v2::after {
